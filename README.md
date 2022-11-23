@@ -18,5 +18,5 @@ A folder /SubmissionChecker will be created inside that folder.
 Every time a new submission gets opened, the /SubmissionChecker folder will be cleaned to prevent cluttering your disk.
 
 <h1>Questions or feedback</h1>
-Please feel free to provide input or make suggestions on how to improve this application by reporting issues or providing comments.
+Please feel free to provide input or make suggestions on how to improve this application by creating an issue.
 
