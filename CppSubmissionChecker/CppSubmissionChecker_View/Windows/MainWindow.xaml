@@ -1,0 +1,63 @@
+﻿<Window x:Class="CppSubmissionChecker_View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CppSubmissionChecker_View"
+        xmlns:uc="clr-namespace:CppSubmissionChecker_View.UserControls"
+        xmlns:vm ="clr-namespace:CppSubmissionChecker_ViewModel;assembly=CppSubmissionChecker_ViewModel"
+        
+        mc:Ignorable="d"
+        Title="DAE Submission Checker"  Width="1280" Height="768"
+        Background="#0d1d2d">
+    <Window.DataContext>
+        <vm:SubmissionCheckerViewModel/>
+    </Window.DataContext>
+    <DockPanel LastChildFill="true">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load Zip" Click="LoadZip_Click"></MenuItem>
+                <MenuItem Header="_Preferences" Click="ShowPreferences_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <StackPanel Visibility="{Binding HasData, Converter={StaticResource BoolToInvisibility}}" Orientation="Vertical" >
+
+                <Label VerticalAlignment="Center" HorizontalAlignment="Center">No Archive selected</Label>
+                <Button HorizontalAlignment="Center" Click="LoadZip_Click">Load Zip Archive</Button>
+
+            </StackPanel>
+            <DockPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" LastChildFill="true" >
+                <TabControl>
+                    <TabItem Header="Submissions">
+                        <Grid Width="200">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBox Name="_studentFilterTxt" Background="Black" TextChanged="Search_TextChanged" Foreground="White"></TextBox>
+                            <ListView Loaded="_studentList_Loaded" DataContextChanged="_studentList_DataContextChanged" Name="_studentList" Grid.Row="1" DockPanel.Dock="Left" Background="{StaticResource HeaderBackgroundBrush}" Foreground="{StaticResource TextBrush}" DataContext="{Binding SelectedArchive}" ScrollViewer.CanContentScroll="True"  ItemsSource="{Binding StudentSubmissions}" DisplayMemberPath="StudentName" SelectionMode="Single" SelectedItem="{Binding SelectedSubmission}" VerticalAlignment="Stretch">
+                            </ListView>
+                        </Grid>
+
+                    </TabItem>
+                </TabControl>
+
+                <Grid DataContext="{Binding SelectedArchive}">
+                    <Grid Visibility="{Binding Loading, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel Orientation="Horizontal" Height="Auto">
+                            <Label>Loading Submission</Label>
+                            <ProgressBar HorizontalAlignment="Stretch" VerticalAlignment="Top" MinWidth="400" Height="20" Value="{Binding LoadingProgress, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"></ProgressBar>
+                        </StackPanel>
+                    </Grid>
+                    <Grid Visibility="{Binding HasSelectedSubmission, Converter={StaticResource BoolToVisibility}}">
+                        <uc:StudentSubmissionDetails DataContext="{Binding SelectedSubmission}"></uc:StudentSubmissionDetails>
+                    </Grid>
+                </Grid>
+            </DockPanel>
+        </Grid>
+
+
+
+    </DockPanel>
+</Window>
