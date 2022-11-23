@@ -5,7 +5,7 @@ This tool allows you to check student submissions one by one, without the need o
 <h1>Usage instructions</h1>
 Download the <b>submissions.zip</b> from the assignment you want to check and open it in the CppSubmissionChecker.
 Every submission inside the submissions.zip should be a .zip file where the name starts with the studentname_ 
-(.rar or .7z are also supported, but may give unstable results).
+(.rar or .7z are also supported, but may result in unstable behavior).
 
 <h2>First Use</h2>
 The first time the program is started, the preferences window will open.
