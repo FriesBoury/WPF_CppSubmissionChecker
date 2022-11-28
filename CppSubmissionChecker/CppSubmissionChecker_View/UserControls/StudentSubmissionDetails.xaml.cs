@@ -71,7 +71,7 @@ namespace CppSubmissionChecker_View.UserControls
                     string? executablePath = null;
                     Process process = new Process();
                     process.StartInfo.FileName = MSBuildPath;
-                    process.StartInfo.Arguments = _submissionViewModel.SelectedSolutionPath;
+                    process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
 
                     await RunAndMonitorProcess(process, _console, true, (outputLine) =>
                     {
@@ -156,7 +156,7 @@ namespace CppSubmissionChecker_View.UserControls
             {
                 Process process = new Process();
                 process.StartInfo.FileName = VSPath;
-                process.StartInfo.Arguments = _submissionViewModel.SelectedSolutionPath;
+                process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
 
                 process.Start();
             }
@@ -168,7 +168,7 @@ namespace CppSubmissionChecker_View.UserControls
             {
                 Process process = new Process();
                 process.StartInfo.FileName = "explorer";
-                process.StartInfo.Arguments = "/select,  " + _submissionViewModel.SelectedSolutionPath;
+                process.StartInfo.Arguments = "/select,  " + $"\"{_submissionViewModel.SelectedSolutionPath}\"";
                 process.Start();
             }
         }

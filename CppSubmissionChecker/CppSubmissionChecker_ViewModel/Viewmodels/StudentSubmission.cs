@@ -63,6 +63,33 @@ namespace CppSubmissionChecker_ViewModel
             }
         }
 
+        private string SanitizeDirectories(string dir)
+        {
+            const string illegalChars = ".";
+            string newName = dir;
+            for (int charIdx = 0; charIdx < illegalChars.Length; charIdx++)
+            {
+                char c = illegalChars[charIdx];
+                if (newName.Contains(c))
+                {
+                    newName = newName.Replace(c, '_');
+                }
+            }
+
+            if (newName != dir)
+            {
+                Directory.Move(dir, newName);
+            }
+
+            foreach(var subDir in Directory.GetDirectories(newName))
+            {
+                SanitizeDirectories(subDir);
+            }
+
+            return newName;
+
+
+        }
         //TODO: Move extraction functionality to a separate SubmissionArchive class per type (based on file extension)
         public bool ExtractToPath(string dirPath, bool deleteExistingFiles, Action<float>? pctCallback = null)
         {
@@ -170,6 +197,8 @@ namespace CppSubmissionChecker_ViewModel
 
             if (FullDirPath != null)
             {
+                //SanitizeDir
+                FullDirPath = SanitizeDirectories(FullDirPath);
                 //Find SLNPath
                 List<string> paths = new List<string>();
                 FindSolutionsInDirectory(FullDirPath, ref paths);

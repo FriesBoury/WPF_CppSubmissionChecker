@@ -65,6 +65,8 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
                 string name = entry.Name;
                 StudentSubmissions.Add(new StudentSubmission(name, entry));
             }
+
+            StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();
         }
 
         private void SetLoadingProgress(float progress)
