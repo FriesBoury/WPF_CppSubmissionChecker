@@ -14,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace CppSubmissionChecker_View.UserControls
 {
@@ -88,6 +88,7 @@ namespace CppSubmissionChecker_View.UserControls
                         //Run the build
                         Process runProcess = new Process();
                         runProcess.StartInfo.FileName = executablePath;
+                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_submissionViewModel.SelectedSolutionPath);
                         await RunAndMonitorProcess(runProcess, _console2, true, null);
                     }
 

@@ -16,19 +16,9 @@
         <DockPanel>
             <Label DockPanel.Dock="Top" Content="{Binding Name}">
             </Label>
-            <TabControl DockPanel.Dock="Bottom" Height="300" Name="_tabcontrol">
-                <TabItem Header="Build output" >
-                    <TextBox VerticalScrollBarVisibility="Auto" FontFamily="Consolas" x:Name="_console" Background="Black" Foreground="White" IsReadOnly="True">
-
-                    </TextBox>
-                </TabItem>
-                <TabItem Header="Execution output">
-                    <TextBox VerticalScrollBarVisibility="Auto" FontFamily="Consolas" x:Name="_console2"  Background="Black" Foreground="White" IsReadOnly="True">
-
-                    </TextBox>
-                </TabItem>
-            </TabControl>
+          
             <TabControl DockPanel.Dock="Bottom">
+                <!--solutions -->
                 <TabItem Header="Solutions">
                     <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Background="{StaticResource BackgroundBrush}">
                         <ComboBox ItemsSource="{Binding SolutionPaths}" SelectedValue="{Binding SelectedSolutionPath}"></ComboBox>
@@ -59,26 +49,41 @@
                                 </StackPanel>
                             </Button>
                         </StackPanel>
+                        <!-- output windows-->
+                        <TabControl DockPanel.Dock="Bottom" Height="300" Name="_tabcontrol">
+                            <TabItem Header="Build output" >
+                                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontFamily="Consolas" x:Name="_console" Background="Black" Foreground="White" IsReadOnly="True">
+
+                                </TextBox>
+                            </TabItem>
+                            <TabItem Header="Execution output">
+                                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontFamily="Consolas" x:Name="_console2"  Background="Black" Foreground="White" IsReadOnly="True">
+
+                                </TextBox>
+                            </TabItem>
+                        </TabControl>
                     </StackPanel>
                 </TabItem>
-            </TabControl>
-            <TabControl DockPanel.Dock="Left" Width="200">
-                <TabItem Header="Files">
-                    <TreeView Background="{StaticResource BackgroundBrush}" DataContext="{Binding DirectoryTree}" ItemsSource="{Binding Items}"  x:Name="_directoryTree" SelectedItemChanged="_directoryTree_SelectedItemChanged">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type vm:UserDirectory}" ItemsSource="{Binding Items}">
-                                <Label Content="{Binding Name}" />
-                            </HierarchicalDataTemplate>
-                            <DataTemplate DataType="{x:Type vm:UserFile}">
-                                <Label Content="{Binding Name}" />
-                            </DataTemplate>
-                        </TreeView.Resources>
-                    </TreeView>
+                <TabItem Header="Project source">
+                    <DockPanel LastChildFill="True">
+                        <TreeView DockPanel.Dock="Left" Background="{StaticResource BackgroundBrush}" DataContext="{Binding DirectoryTree}" ItemsSource="{Binding Items}"  x:Name="_directoryTree" SelectedItemChanged="_directoryTree_SelectedItemChanged">
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type vm:UserDirectory}" ItemsSource="{Binding Items}">
+                                    <Label Content="{Binding Name}" />
+                                </HierarchicalDataTemplate>
+                                <DataTemplate DataType="{x:Type vm:UserFile}">
+                                    <Label Content="{Binding Name}" />
+                                </DataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+                        <local:CodeFileViewer x:Name="_codeViewer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                        </local:CodeFileViewer>
+                    </DockPanel>
                 </TabItem>
             </TabControl>
-            <local:CodeFileViewer x:Name="_codeViewer">
-
-            </local:CodeFileViewer>
+         
+        
         </DockPanel>
     </Grid>
 </UserControl>

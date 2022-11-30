@@ -59,10 +59,7 @@ namespace CppSubmissionChecker_View.Windows
             openFileDialog.IsFolderPicker = true;
             openFileDialog.InitialDirectory = "%ProgramFiles%";
             openFileDialog.Title = "Select Visual Studio Directory";
-
-          
-          
-
+                      
             if (openFileDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 string fileName = openFileDialog.FileName;
