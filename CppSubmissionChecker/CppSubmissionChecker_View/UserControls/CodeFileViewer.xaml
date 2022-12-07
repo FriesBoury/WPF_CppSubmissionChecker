@@ -14,7 +14,7 @@
     </UserControl.DataContext>
     <UserControl.Resources>
         <DataTemplate x:Key="_headerTemplate" DataType="{x:Type vm:CodeFile_VM}">
-            
+
             <Grid>
                 <Label Content="{Binding FileName}" Margin="0 0 22 0" FontFamily="Consolas" Cursor="Hand" Foreground="{StaticResource TextBrush}"></Label>
                 <Button BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Right" Width="20" Height="20" Click="File_Close" Padding="0">
@@ -23,22 +23,31 @@
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="_fileTemplate" DataType="{x:Type vm:CodeFile_VM}">
-            <avalon:TextEditor DataContext="{Binding FileContent}" Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
+            <Grid>
+
+                <avalon:TextEditor DataContext="{Binding FileContent}" 
+                                    Background="#1e1e1e"
+                                    Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
                                     ShowLineNumbers="True"
                                     SyntaxHighlighting="C++"
                                     FontFamily="Consolas"
-                                    FontSize="10pt" Background="White" 
-                                    IsReadOnly="True"
-                                    Text=""/>
+                                    FontSize="10pt" 
+                                    IsReadOnly="False"
+                                   Foreground="#C8C8C8"
+                                    Text="">
+                </avalon:TextEditor>
+                <Button Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Top" >Save</Button>
+                
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource  _headerTemplate}" ContentTemplate="{StaticResource _fileTemplate}"> 
-           
+        <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource  _headerTemplate}" ContentTemplate="{StaticResource _fileTemplate}">
+
         </TabControl>
         <TabControl DockPanel.Dock="Left" Name ="_emptyTabControl" Visibility="Hidden" >
             <TabItem Header="File Viewer" Name="_fileViewerTabItem" >
-               
+
                 <Grid Background="{StaticResource BackgroundBrush}">
                     <Label FontSize="10" FontFamily="Consolas" Foreground="Gray">No file selected</Label>
 

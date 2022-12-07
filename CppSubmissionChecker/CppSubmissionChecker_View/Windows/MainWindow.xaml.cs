@@ -37,13 +37,15 @@ namespace CppSubmissionChecker_View
         {
             this.DataContextChanged += MainWindow_DataContextChanged;
             this.Loaded += MainWindow_Loaded;
-            this.Activated += MainWindow_Activated;    
+            this.Activated += MainWindow_Activated;
             InitializeComponent();
         }
 
+       
+
         private void MainWindow_Activated(object? sender, EventArgs e)
         {
-            if(_preferencesWindow != null)
+            if (_preferencesWindow != null)
             {
                 _preferencesWindow.Activate();
             }
@@ -67,8 +69,8 @@ namespace CppSubmissionChecker_View
 
         void CheckShowPreferences()
         {
-    
-            if(_preferencesWindow != null && _preferencesWindow.IsActive) { return; }
+
+            if (_preferencesWindow != null && _preferencesWindow.IsActive) { return; }
             if (!Preferences.Validate())
             {
                 this.IsEnabled = false;

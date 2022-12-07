@@ -11,6 +11,8 @@ namespace CppSubmissionChecker_ViewModel
         }
         public string FilePath { get; set; }
         public string Name { get { return Path.GetFileName(FilePath); } }
+
+        public bool IsMarked { get; set; }
     }
 
     public class UserDirectory

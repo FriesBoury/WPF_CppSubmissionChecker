@@ -7,12 +7,23 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel
 {
-    public class CodeFile_VM
+    public class CodeFile_VM : ViewModelBase
     {
+        private bool _enableEditing;
+
         public event EventHandler? Closed;
         public string? Path { get; set; }
         public string? FileName { get; set; }
         public string? FileContent { get; set; }
+
+        public bool EnableEditing
+        {
+            get => _enableEditing; set
+            {
+                _enableEditing = value;
+                OnPropertyChanged(nameof(EnableEditing));
+            }
+        }
 
         public void Close()
         {
@@ -46,8 +57,13 @@ namespace CppSubmissionChecker_ViewModel
                 SelectedCodeFile = existing;
                 OnPropertyChanged(nameof(SelectedCodeFile));
             }
+        }
 
-
+        public void Clear()
+        {
+            CodeFiles.Clear();
+            SelectedCodeFile = null;
+            OnPropertyChanged(nameof(SelectedCodeFile));
         }
 
         bool IsTextFile(string? path)
@@ -71,7 +87,7 @@ namespace CppSubmissionChecker_ViewModel
             if (sender is CodeFile_VM codeFileVm)
             {
                 CodeFiles.Remove(codeFileVm);
-                if(codeFileVm == SelectedCodeFile)
+                if (codeFileVm == SelectedCodeFile)
                 {
                     SelectedCodeFile = null;
                 }

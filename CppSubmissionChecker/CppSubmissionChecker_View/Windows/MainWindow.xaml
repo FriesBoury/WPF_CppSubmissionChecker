@@ -9,7 +9,8 @@
         
         mc:Ignorable="d"
         Title="DAE Submission Checker"  Width="1280" Height="768"
-        Background="#0d1d2d">
+        Background="#0d1d2d" 
+        WindowStyle="SingleBorderWindow">
     <Window.DataContext>
         <vm:SubmissionCheckerViewModel/>
     </Window.DataContext>

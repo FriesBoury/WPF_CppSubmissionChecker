@@ -14,6 +14,10 @@ namespace CppSubmissionChecker_ViewModel
 
     public class StudentSubmission : ViewModelBase
     {
+        public event Action<StudentSubmission>? UnloadRequested;
+        public event Action? FinishedLoading;
+
+        public bool Loaded { get; set; } = false;
         // Public Properties
         public string Name { get; private set; }
         public string StudentName { get; private set; }
@@ -22,6 +26,18 @@ namespace CppSubmissionChecker_ViewModel
         public long Size { get; private set; }
         public UserDirectory? DirectoryTree { get; private set; }
         public ObservableCollection<string> SolutionPaths { get; private set; } = new ObservableCollection<string>();
+
+        public bool IsUnloading
+        {
+            get => _isUnloading; set
+            {
+                _isUnloading = value;
+                OnPropertyChanged(nameof(IsUnloading));
+            }
+        }
+
+
+
         public string? SelectedSolutionPath
         {
             get => _selectedSolutionPath;
@@ -35,6 +51,7 @@ namespace CppSubmissionChecker_ViewModel
         // Private fields
         private ZipArchiveEntry? _archiveEntry;
         private string? _selectedSolutionPath;
+        private bool _isUnloading;
 
         // Constructors
 
@@ -62,7 +79,14 @@ namespace CppSubmissionChecker_ViewModel
                 StudentName = Name.Substring(0, separatorIndex);
             }
         }
-
+        public async Task Unload()
+        {
+            UnloadRequested?.Invoke(this);
+            while (Loaded)
+            {
+                await Task.Delay(1000);
+            }
+        }
         //TODO: Move extraction functionality to a separate SubmissionArchive class per type (based on file extension)
         public bool ExtractToPath(string dirPath, bool deleteExistingFiles, Action<float>? pctCallback = null)
         {
@@ -182,10 +206,11 @@ namespace CppSubmissionChecker_ViewModel
 
                     SelectedSolutionPath = SolutionPaths.FirstOrDefault();
                     DirectoryTree = new UserDirectory(FullDirPath);
-
+                    FinishedLoading?.Invoke();
                     OnPropertyChanged(nameof(DirectoryTree));
 
                 });
+                Loaded = true;
                 return true;
             }
 

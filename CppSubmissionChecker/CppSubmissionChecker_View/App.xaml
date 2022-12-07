@@ -19,17 +19,12 @@
             <SolidColorBrush x:Key="PrimaryColor" Color="#107090"></SolidColorBrush>
             <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackgroundColor}"></SolidColorBrush>
 
-            <SolidColorBrush x:Key="PitsOrange" Color="#e9621e" />
-            <SolidColorBrush x:Key="PitsWhite" Color="#f7f7f7" />
-            <SolidColorBrush x:Key="PitsDarkGrey" Color="#252120" />
-            <SolidColorBrush x:Key="PitsMediumGrey" Color="#353535" />
-            <SolidColorBrush x:Key="PitsGrey" Color="#808080" />
-            <SolidColorBrush x:Key="PitsLightGrey" Color="#b9b9b8" />
-            <SolidColorBrush x:Key="PitsBlockColor" Color="#FF22C1D1" />
-            <SolidColorBrush x:Key="PitsInteractionColor" Color="#FF65BF2D" />
-            <SolidColorBrush x:Key="PitsBlockReferenceTitleSelected" Color="#FF8351F0"/>
-            <SolidColorBrush x:Key="PitsBlockReferenceTitleNotSelected" Color="#FFA691D8"/>
-    
+            <SolidColorBrush x:Key="CustomOrange" Color="#e9621e" />
+            <SolidColorBrush x:Key="CustomWhite" Color="#f7f7f7" />
+            <SolidColorBrush x:Key="CustomDarkGrey" Color="#252120" />
+            <SolidColorBrush x:Key="CustomMediumGray" Color="#353535" />
+            <SolidColorBrush x:Key="CustomGrey" Color="#808080" />
+            <SolidColorBrush x:Key="CustomLightGrey" Color="#b9b9b8" />
 
             <SolidColorBrush x:Key="PitsGreen" Color="#46a55a" />
             <SolidColorBrush x:Key="PitsRed" Color="#d23c3c" />
@@ -109,7 +104,7 @@
                                     <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="true">
-                                    <Setter Property="Foreground" Value="{StaticResource PitsWhite}" />
+                                    <Setter Property="Foreground" Value="{StaticResource CustomWhite}" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -120,8 +115,8 @@
 
             <Style TargetType="{x:Type Button}">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}" />
-                <Setter Property="Background" Value="{StaticResource PitsMediumGrey}" />
-                <Setter Property="Foreground" Value="{StaticResource PitsLightGrey}" />
+                <Setter Property="Background" Value="{StaticResource CustomMediumGray}" />
+                <Setter Property="Foreground" Value="{StaticResource CustomLightGrey}" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="Padding" Value="10,5" />
@@ -332,7 +327,7 @@
                     </Grid.ColumnDefinitions>
                     <Border
                         Grid.ColumnSpan="3"
-                        Background="{StaticResource PitsMediumGrey}"
+                        Background="{StaticResource CustomMediumGray}"
                         CornerRadius="0" />
                     <RepeatButton
                         Grid.Column="0"

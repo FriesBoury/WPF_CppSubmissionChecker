@@ -72,7 +72,15 @@
                                     <Label Content="{Binding Name}" />
                                 </HierarchicalDataTemplate>
                                 <DataTemplate DataType="{x:Type vm:UserFile}">
-                                    <Label Content="{Binding Name}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox IsChecked="{Binding IsMarked}"></CheckBox>
+                                        <Label Grid.Column="1" Content="{Binding Name}" />
+                                    </Grid>
+                                  
                                 </DataTemplate>
                             </TreeView.Resources>
                         </TreeView>
@@ -85,5 +93,13 @@
          
         
         </DockPanel>
-    </Grid>
+        <Grid Visibility="{Binding IsUnloading, Converter={StaticResource BoolToVisibility}}" Background="Black" Opacity="0.8" >
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Label FontSize="20" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Bottom" VerticalAlignment="Stretch" Foreground="White" FontFamily="Consolas" >Waiting for submission to be unloaded...</Label>
+            <Label FontSize="20" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Top" VerticalAlignment="Stretch"  Foreground="Yellow"  FontFamily="Consolas" > Please close any running executables launched from the previous submission to continue!</Label>
+        </Grid>
+           </Grid>
 </UserControl>

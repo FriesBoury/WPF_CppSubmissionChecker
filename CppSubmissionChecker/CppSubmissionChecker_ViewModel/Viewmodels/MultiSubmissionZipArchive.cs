@@ -39,15 +39,23 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             get => _selectedStudentSubmission;
             set
             {
-                _selectedStudentSubmission = value;
-                if (_selectedStudentSubmission != null)
-                {
-                    LoadSubmission(_selectedStudentSubmission);
-                }
-                OnPropertyChanged(nameof(SelectedSubmission));
-                OnPropertyChanged(nameof(HasSelectedSubmission));
-
+                SwapSubmission(value);
             }
+        }
+
+        async void SwapSubmission(StudentSubmission? value)
+        {
+            if (_selectedStudentSubmission != null)
+            {
+                await UnloadSubmission(_selectedStudentSubmission);
+            }
+            _selectedStudentSubmission = value;
+            if (_selectedStudentSubmission != null)
+            {
+                LoadSubmission(_selectedStudentSubmission);
+            }
+            OnPropertyChanged(nameof(SelectedSubmission));
+            OnPropertyChanged(nameof(HasSelectedSubmission));
         }
 
         //Constructor
@@ -73,6 +81,11 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         {
             LoadingProgress = progress*100;
             OnPropertyChanged(nameof(LoadingProgress));
+        }
+
+        async Task UnloadSubmission(StudentSubmission submission)
+        {
+            await submission.Unload();
         }
         async void LoadSubmission(StudentSubmission submission)
         {
