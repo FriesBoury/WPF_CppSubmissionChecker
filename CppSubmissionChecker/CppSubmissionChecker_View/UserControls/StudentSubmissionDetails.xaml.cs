@@ -52,7 +52,7 @@ namespace CppSubmissionChecker_View.UserControls
 
                     for (int i = 0; i < _markedFiles.Count; ++i)
                     {
-                        int sourceIndex = _markedFiles[i].IndexOf("source", StringComparison.InvariantCultureIgnoreCase);
+                        int sourceIndex = _markedFiles[i].IndexOf(Preferences.ProjectRootFolderName, StringComparison.InvariantCultureIgnoreCase);
                         if (sourceIndex >= 0)
                         {
 

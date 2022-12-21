@@ -14,7 +14,18 @@ namespace CppSubmissionChecker_ViewModel
         {
             _cachingProvider = new RegistryCachingProvider();
         }
-
+        public static string ProjectRootFolderName
+        {
+            get {
+                var value = _cachingProvider.GetStringAsync("ProjectRootFolderName").GetAwaiter().GetResult();
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    value = "source";
+                }
+                return value;
+            }
+            set => _cachingProvider.SetStringAsync("ProjectRootFolderName", value);
+        }
         public static string TempFolderPath
         {
             get => _cachingProvider.GetStringAsync("TempFolderPath").GetAwaiter().GetResult();

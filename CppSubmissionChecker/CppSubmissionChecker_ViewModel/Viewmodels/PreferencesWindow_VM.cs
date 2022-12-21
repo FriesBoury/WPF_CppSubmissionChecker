@@ -42,6 +42,19 @@ namespace CppSubmissionChecker_ViewModel
             }
         }
 
+
+        public string ProjectRootFolderName
+        {
+            get => Preferences.ProjectRootFolderName;
+            set
+            {
+                Preferences.ProjectRootFolderName = value;
+                OnPropertyChanged(nameof(TempFolderPath));
+                OnPropertyChanged(nameof(IsValid));
+            }
+        }
+
+
         public bool IsValid => Preferences.Validate();
         public void SetVisualstudioFolder(string path)
         {
