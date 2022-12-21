@@ -36,8 +36,10 @@
                                    Foreground="#C8C8C8"
                                     Text="">
                 </avalon:TextEditor>
-                <Button Click="Button_Click" HorizontalAlignment="Right" VerticalAlignment="Top" >Save</Button>
-                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button Click="ShowInExplorer_Click" >Show in Explorer</Button>
+                <Button Click="Save_Click" >Save</Button>
+                </StackPanel>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>

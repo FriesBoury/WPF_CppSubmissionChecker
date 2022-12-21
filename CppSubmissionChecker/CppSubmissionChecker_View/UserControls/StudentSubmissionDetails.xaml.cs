@@ -206,6 +206,7 @@ namespace CppSubmissionChecker_View.UserControls
             process.StartInfo.RedirectStandardOutput = true;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = hideConsole;
+            process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
             console.Clear();
 
             Action<string> appendText = (txt) => { console.AppendText(txt); };
@@ -246,6 +247,7 @@ namespace CppSubmissionChecker_View.UserControls
                 beforeExeIndex += 3;
                 executablePath = executablePath.Substring(beforeExeIndex, exeIndex - beforeExeIndex + 4);
             }
+            
         }
 
         private async void OpenInVS_Click(object sender, RoutedEventArgs e)

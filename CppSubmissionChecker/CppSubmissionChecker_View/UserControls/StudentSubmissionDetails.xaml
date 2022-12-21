@@ -13,16 +13,15 @@
         <vm:StudentSubmission></vm:StudentSubmission>
     </d:UserControl.DataContext>
     <Grid>
-        <DockPanel>
+        <DockPanel LastChildFill="true">
             <Label DockPanel.Dock="Top" Content="{Binding Name}">
             </Label>
-          
-            <TabControl DockPanel.Dock="Bottom">
+            <TabControl >
                 <!--solutions -->
                 <TabItem Header="Solutions">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical" Background="{StaticResource BackgroundBrush}">
-                        <ComboBox ItemsSource="{Binding SolutionPaths}" SelectedValue="{Binding SelectedSolutionPath}"></ComboBox>
-                        <Grid>
+                    <DockPanel Background="{StaticResource BackgroundBrush}">
+                        <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding SolutionPaths}" SelectedValue="{Binding SelectedSolutionPath}"></ComboBox>
+                        <Grid DockPanel.Dock="Top">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
@@ -35,7 +34,7 @@
                                 <icons:PackIconMaterial Kind="FileFind"/>
                             </Button>
                         </Grid>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                             <Button HorizontalAlignment="Left" Click="BuildAndRun_Click">
                                 <StackPanel Orientation="Horizontal">
                                     <icons:PackIconMaterial Kind="Play" VerticalAlignment="Stretch" Foreground="Green"></icons:PackIconMaterial>
@@ -50,7 +49,7 @@
                             </Button>
                         </StackPanel>
                         <!-- output windows-->
-                        <TabControl DockPanel.Dock="Bottom" Height="300" Name="_tabcontrol">
+                        <TabControl VerticalAlignment="Stretch" Name="_tabcontrol">
                             <TabItem Header="Build output" >
                                 <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontFamily="Consolas" x:Name="_console" Background="Black" Foreground="White" IsReadOnly="True">
 
@@ -62,25 +61,48 @@
                                 </TextBox>
                             </TabItem>
                         </TabControl>
-                    </StackPanel>
+                    </DockPanel>
                 </TabItem>
                 <TabItem Header="Project source">
                     <DockPanel LastChildFill="True">
                         <TreeView DockPanel.Dock="Left" Background="{StaticResource BackgroundBrush}" DataContext="{Binding DirectoryTree}" ItemsSource="{Binding Items}"  x:Name="_directoryTree" SelectedItemChanged="_directoryTree_SelectedItemChanged">
                             <TreeView.Resources>
+
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Style.Resources>
+                                        <!-- Style the inactive selection the same as active -->
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource SecondaryColor}"/>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource SecondaryColor}"/>
+
+                                    </Style.Resources>
+                                    <Setter Property="IsExpanded" Value="{Binding Path=IsOpen, Mode=OneWayToSource}"></Setter>
+                                    <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+
+                                </Style>
                                 <HierarchicalDataTemplate DataType="{x:Type vm:UserDirectory}" ItemsSource="{Binding Items}">
-                                    <Label Content="{Binding Name}" />
-                                </HierarchicalDataTemplate>
-                                <DataTemplate DataType="{x:Type vm:UserFile}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="20"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox IsChecked="{Binding IsMarked}"></CheckBox>
+                                        <icons:PackIconMaterial Grid.Column="0" VerticalAlignment="Center" Kind="FolderOutline" Foreground="{StaticResource PrimaryColorBrush}" Visibility="{Binding IsOpen, Converter={StaticResource BoolToInvisibility}}"/>
+                                        <icons:PackIconMaterial Grid.Column="0" VerticalAlignment="Center"  Kind="FolderOpenOutline" Foreground="{StaticResource PrimaryColorBrush}" Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}"/>
                                         <Label Grid.Column="1" Content="{Binding Name}" />
                                     </Grid>
-                                  
+
+                                </HierarchicalDataTemplate>
+                                <DataTemplate DataType="{x:Type vm:UserFile}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox VerticalAlignment="Center"  IsChecked="{Binding IsMarked}"></CheckBox>
+                                        <icons:PackIconMaterial Grid.Column="1" VerticalAlignment="Center"  Kind="FileOutline" Foreground="{StaticResource PrimaryColorBrush}" Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}"/>
+                                        <Label Grid.Column="2" Content="{Binding Name}" />
+                                    </Grid>
+
                                 </DataTemplate>
                             </TreeView.Resources>
                         </TreeView>
@@ -90,8 +112,6 @@
                     </DockPanel>
                 </TabItem>
             </TabControl>
-         
-        
         </DockPanel>
         <Grid Visibility="{Binding IsUnloading, Converter={StaticResource BoolToVisibility}}" Background="Black" Opacity="0.8" >
             <Grid.RowDefinitions>

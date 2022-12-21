@@ -13,10 +13,12 @@
             <Color x:Key="BackgroundColor" >#1d2d3d</Color>
             <Color x:Key="HeaderBackgroundColor" >#0d1d2d</Color>
             <Color x:Key="TextColor" >#d0d0d0</Color>
+            <Color x:Key="PrimaryColor" >#107090</Color>
+            <Color x:Key="SecondaryColor" >#047</Color>
 
             <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"></SolidColorBrush>
             <SolidColorBrush x:Key="TextBrush" Color="{StaticResource TextColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="PrimaryColor" Color="#107090"></SolidColorBrush>
+            <SolidColorBrush x:Key="PrimaryColorBrush" Color="{StaticResource PrimaryColor}"></SolidColorBrush>
             <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="{StaticResource HeaderBackgroundColor}"></SolidColorBrush>
 
             <SolidColorBrush x:Key="CustomOrange" Color="#e9621e" />
@@ -123,7 +125,7 @@
                 <Setter Property="Margin" Value="2,2,2,2" />
                 <Setter Property="FontSize" Value="12"/>
                 <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColor}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryColorBrush}" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
@@ -147,8 +149,8 @@
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="BorderThickness" Value="2" />
-                                    <!--<Setter Property="Background" Value="{DynamicResource PrimaryColor}" />-->
-                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryColor}" />
+                                    <!--<Setter Property="Background" Value="{DynamicResource PrimaryColorBrush}" />-->
+                                    <Setter Property="Foreground" Value="{DynamicResource PrimaryColorBrush}" />
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter Property="Opacity" Value="0.5"/>
@@ -268,7 +270,7 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="0"
                                 CornerRadius="0">
-                                <Rectangle Fill="{DynamicResource PrimaryColor}" Opacity="0.5"/>
+                                <Rectangle Fill="{DynamicResource PrimaryColorBrush}" Opacity="0.5"/>
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -437,7 +439,7 @@
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource PrimaryColor}" />
+                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource PrimaryColorBrush}" />
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="False">
                                     <Setter TargetName="Panel" Property="Background" Value="{StaticResource BackgroundBrush}" />

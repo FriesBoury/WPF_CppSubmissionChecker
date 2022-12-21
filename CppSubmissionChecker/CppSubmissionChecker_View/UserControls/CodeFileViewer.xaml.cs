@@ -4,6 +4,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -109,7 +110,7 @@ namespace CppSubmissionChecker_View.UserControls
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Save_Click(object sender, RoutedEventArgs e)
         {
             string? path = ((sender as FrameworkElement)?.DataContext as CodeFile_VM)?.Path;
             string? text = (sender as FrameworkElement)?.Parent.FindChild<TextEditor>()?.Text;
@@ -118,6 +119,17 @@ namespace CppSubmissionChecker_View.UserControls
             {
                 File.WriteAllText(path, text);
             }
+        }
+
+        private void ShowInExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            string? path = ((sender as FrameworkElement)?.DataContext as CodeFile_VM)?.Path;
+            if (string.IsNullOrEmpty(path))
+                return;
+            Process process = new Process();
+            process.StartInfo.FileName = "explorer";
+            process.StartInfo.Arguments = "/select,  " + $"\"{path}\"";
+            process.Start();
         }
     }
 }
