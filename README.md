@@ -21,7 +21,7 @@ Every time a new submission gets opened, the /SubmissionChecker folder will be c
 In the Directory Tree view under the <b>Project Source</b> tab, there's a checkbox next to each file that can be previewed.
 By checking the checkbox, you mark that file for "Keep Open".
 Selecting another submission will then automatically open files with the same relative path of the newly opened submission.
-You can specify the folder name this relative path has to start with in order to match with the checked files.
+You can specify the folder name this relative path has to start with in order to match with the checked files in the preferences window.
 
 <h1>Feedback</h1>
 Please feel free to provide input on how to improve this application by creating an issue.
