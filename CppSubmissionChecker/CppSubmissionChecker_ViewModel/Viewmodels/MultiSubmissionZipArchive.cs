@@ -103,7 +103,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
                 }
                 await Task.Run(() =>
                 {
-                    submission.ExtractToPath(fullPath, true, SetLoadingProgress);
+                    submission.ExtractToPath(fullPath, !Preferences.KeepSubmissions, SetLoadingProgress);
                 });
             }
             catch (Exception e)

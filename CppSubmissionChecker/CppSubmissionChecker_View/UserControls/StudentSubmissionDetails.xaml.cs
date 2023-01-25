@@ -25,8 +25,7 @@ namespace CppSubmissionChecker_View.UserControls
     public partial class StudentSubmissionDetails : UserControl
     {
         List<string> _markedFiles = new List<string>(20);
-        const string MSBuildPath = "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\MSBuild\\Current\\Bin\\MSBuild.exe";
-        const string VSPath = "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\Common7\\IDE\\devenv.exe";
+
         StudentSubmission? _submissionViewModel;
 
         private List<Process> _runningProcesses = new List<Process>();
@@ -156,6 +155,7 @@ namespace CppSubmissionChecker_View.UserControls
 
         private async void BuildAndRun_Click(object sender, RoutedEventArgs e)
         {
+            
             try
             {
                 if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
@@ -166,7 +166,7 @@ namespace CppSubmissionChecker_View.UserControls
                     _console2.Text = "";
                     string? executablePath = null;
                     Process process = new Process();
-                    process.StartInfo.FileName = MSBuildPath;
+                    process.StartInfo.FileName = Preferences.MSBuildPath;
                     process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
                     _runningProcesses.Add(process);
                     await RunAndMonitorProcess(process, _console, true, (outputLine) =>
@@ -255,7 +255,7 @@ namespace CppSubmissionChecker_View.UserControls
             if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
             {
                 Process process = new Process();
-                process.StartInfo.FileName = VSPath;
+                process.StartInfo.FileName = Preferences.VisualStudioPath;
                 process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
                 _runningProcesses.Add(process);
                 process.Start();

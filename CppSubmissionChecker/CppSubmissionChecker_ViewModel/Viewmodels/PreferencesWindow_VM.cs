@@ -54,6 +54,11 @@ namespace CppSubmissionChecker_ViewModel
             }
         }
 
+        public bool KeepSubmissions
+        {
+            get => Preferences.KeepSubmissions;
+            set => Preferences.KeepSubmissions = value ;
+        }
 
         public bool IsValid => Preferences.Validate();
         public void SetVisualstudioFolder(string path)
@@ -73,7 +78,7 @@ namespace CppSubmissionChecker_ViewModel
         private static string? SearchFileRecursively(string fileName, string directoryPath)
         {
             fileName = fileName.ToLowerInvariant();
-            foreach(var file in Directory.GetFiles(directoryPath))
+            foreach (var file in Directory.GetFiles(directoryPath))
             {
                 if (file.ToLowerInvariant().EndsWith(fileName))
                 {
@@ -81,7 +86,7 @@ namespace CppSubmissionChecker_ViewModel
                 }
             }
 
-            foreach(var dir in Directory.GetDirectories(directoryPath))
+            foreach (var dir in Directory.GetDirectories(directoryPath))
             {
                 string? filePath = SearchFileRecursively(fileName, dir);
                 if (!string.IsNullOrEmpty(filePath))

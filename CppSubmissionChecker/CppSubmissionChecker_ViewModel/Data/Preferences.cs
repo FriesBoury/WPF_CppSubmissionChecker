@@ -40,8 +40,13 @@ namespace CppSubmissionChecker_ViewModel
 
         public static string MSBuildPath
         {
-            get => _cachingProvider.GetStringAsync("VisualStudioPath").GetAwaiter().GetResult();
-            set => _cachingProvider.SetStringAsync("VisualStudioPath", value);
+            get => _cachingProvider.GetStringAsync("MSBuildPath").GetAwaiter().GetResult();
+            set => _cachingProvider.SetStringAsync("MSBuildPath", value);
+        }
+        public static bool KeepSubmissions
+        {
+            get => _cachingProvider.GetStringAsync("KeepSubmissions").GetAwaiter().GetResult() == "true";
+            set => _cachingProvider.SetStringAsync("KeepSubmissions", value? "true" : "false");
         }
 
         public static bool Validate()

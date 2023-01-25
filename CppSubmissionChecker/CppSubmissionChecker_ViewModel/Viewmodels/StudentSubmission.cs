@@ -93,15 +93,18 @@ namespace CppSubmissionChecker_ViewModel
             if (_archiveEntry == null) return false;
             try
             {
-                //Clear directory
-                foreach (var file in Directory.GetFiles(dirPath))
+                if (deleteExistingFiles)
                 {
-                    File.Delete(file);
-                }
+                    //Clear directory
+                    foreach (var file in Directory.GetFiles(dirPath))
+                    {
+                        File.Delete(file);
+                    }
 
-                foreach (var dir in Directory.GetDirectories(dirPath))
-                {
-                    Directory.Delete(dir, true);
+                    foreach (var dir in Directory.GetDirectories(dirPath))
+                    {
+                        Directory.Delete(dir, true);
+                    }
                 }
 
                 string archiveName = _archiveEntry.Name;
@@ -111,6 +114,10 @@ namespace CppSubmissionChecker_ViewModel
                 if (!Directory.Exists(FullDirPath))
                 {
                     Directory.CreateDirectory(FullDirPath);
+                }
+                else
+                {
+                    return false;
                 }
                 float progress = 0f;
                 pctCallback?.Invoke(progress);
