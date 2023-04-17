@@ -168,6 +168,10 @@ namespace CppSubmissionChecker_View.UserControls
                     Process process = new Process();
                     process.StartInfo.FileName = Preferences.MSBuildPath;
                     process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
+                    if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
+                    {
+                        process.StartInfo.Arguments += " " + Preferences.BuildParams;
+                    }
                     _runningProcesses.Add(process);
                     await RunAndMonitorProcess(process, _console, true, (outputLine) =>
                     {

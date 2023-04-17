@@ -60,6 +60,12 @@ namespace CppSubmissionChecker_ViewModel
             set => Preferences.KeepSubmissions = value ;
         }
 
+        public string BuildParams
+        {
+            get => Preferences.BuildParams;
+            set => Preferences.BuildParams = value;
+        }
+
         public bool IsValid => Preferences.Validate();
         public void SetVisualstudioFolder(string path)
         {

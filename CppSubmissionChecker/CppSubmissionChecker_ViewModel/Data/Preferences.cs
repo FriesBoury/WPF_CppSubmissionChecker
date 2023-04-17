@@ -49,6 +49,12 @@ namespace CppSubmissionChecker_ViewModel
             set => _cachingProvider.SetStringAsync("KeepSubmissions", value? "true" : "false");
         }
 
+        public static string BuildParams
+        {
+            get => _cachingProvider.GetStringAsync(nameof(BuildParams)).GetAwaiter().GetResult();
+            set => _cachingProvider.SetStringAsync(nameof(BuildParams), value);
+        }
+
         public static bool Validate()
         {
             if (string.IsNullOrWhiteSpace(TempFolderPath) || !Directory.Exists(TempFolderPath))
