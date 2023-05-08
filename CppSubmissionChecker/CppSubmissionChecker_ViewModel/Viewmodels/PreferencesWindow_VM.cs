@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel
 {
-    public class PreferencesWindow_VM : ViewModelBase
+    public class PreferencesWindow_VM : ViewmodelBase
     {
         public string VSLocation
         {
@@ -64,6 +64,16 @@ namespace CppSubmissionChecker_ViewModel
         {
             get => Preferences.BuildParams;
             set => Preferences.BuildParams = value;
+        }
+
+        public string UnityInstallation
+        {
+            get => Preferences.UnityInstallation;
+            set
+            {
+                Preferences.UnityInstallation = value;
+                OnPropertyChanged(nameof(UnityInstallation));
+            }
         }
 
         public bool IsValid => Preferences.Validate();

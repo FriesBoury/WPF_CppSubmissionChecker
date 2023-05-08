@@ -55,6 +55,13 @@ namespace CppSubmissionChecker_ViewModel
             set => _cachingProvider.SetStringAsync(nameof(BuildParams), value);
         }
 
+        public static string UnityInstallation
+        {
+            get => _cachingProvider.GetStringAsync(nameof(UnityInstallation)).GetAwaiter().GetResult();
+            set => _cachingProvider.SetStringAsync(nameof(UnityInstallation), value);
+        }
+
+
         public static bool Validate()
         {
             if (string.IsNullOrWhiteSpace(TempFolderPath) || !Directory.Exists(TempFolderPath))
@@ -66,6 +73,10 @@ namespace CppSubmissionChecker_ViewModel
                 return false;
             }
             if (string.IsNullOrWhiteSpace(MSBuildPath) || !File.Exists(MSBuildPath))
+            {
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(UnityInstallation) || !File.Exists(UnityInstallation) || !UnityInstallation.EndsWith("Unity.exe"))
             {
                 return false;
             }

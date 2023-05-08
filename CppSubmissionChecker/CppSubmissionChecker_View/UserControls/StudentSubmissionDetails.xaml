@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel;assembly=CppSubmissionChecker_ViewModel"
+             xmlns:vmUnity="clr-namespace:CppSubmissionChecker_ViewModel.Unity;assembly=CppSubmissionChecker_ViewModel"
              xmlns:local="clr-namespace:CppSubmissionChecker_View.UserControls"
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="768" d:DesignWidth="1028">
     <d:UserControl.DataContext>
-        <vm:StudentSubmission></vm:StudentSubmission>
+        <vmUnity:StudentSubmission_Unity></vmUnity:StudentSubmission_Unity>
     </d:UserControl.DataContext>
     <Grid>
         <DockPanel LastChildFill="true">
@@ -18,6 +19,7 @@
             </Label>
             <TabControl >
                 <!--solutions -->
+
                 <TabItem Header="Solutions">
                     <DockPanel Background="{StaticResource BackgroundBrush}">
                         <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding SolutionPaths}" SelectedValue="{Binding SelectedSolutionPath}"></ComboBox>
@@ -35,10 +37,10 @@
                             </Button>
                         </Grid>
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button HorizontalAlignment="Left" Click="BuildAndRun_Click">
+                            <Button HorizontalAlignment="Left" Command="{Binding OpenProjectCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <icons:PackIconMaterial Kind="Play" VerticalAlignment="Stretch" Foreground="Green"></icons:PackIconMaterial>
-                                    <Label>Build and Run</Label>
+                                    <TextBlock Text="{Binding OpenProjectCommandText}"/>
                                 </StackPanel>
                             </Button>
                             <Button HorizontalAlignment="Left" Click="OpenInVS_Click">
@@ -62,6 +64,29 @@
                             </TabItem>
                         </TabControl>
                     </DockPanel>
+                </TabItem>
+                <TabItem Header="Executables">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <ItemsControl ItemsSource="{Binding Executables}" >
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Grid.Row="0" Width="200" Content="{Binding FileName}" Command="{Binding ClickCommand}" CommandParameter="{Binding Source={RelativeSource Mode=Self}}" ></Button>
+                                        <Label Grid.Row="1" Content="{Binding Path=FullPath}"></Label>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TabControl  VerticalAlignment="Stretch" Grid.Row="1">
+                            <TabItem Header="Execution output">
+                                <local:TextLog DataContext="{Binding ExecutionOutput}"></local:TextLog>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Project source">
                     <DockPanel LastChildFill="True">
@@ -111,6 +136,7 @@
                         </local:CodeFileViewer>
                     </DockPanel>
                 </TabItem>
+
             </TabControl>
         </DockPanel>
         <Grid Visibility="{Binding IsUnloading, Converter={StaticResource BoolToVisibility}}" Background="Black" Opacity="0.8" >
@@ -119,7 +145,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Label FontSize="20" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Bottom" VerticalAlignment="Stretch" Foreground="White" FontFamily="Consolas" >Waiting for submission to be unloaded...</Label>
-            <Label FontSize="20" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Top" VerticalAlignment="Stretch"  Foreground="Yellow"  FontFamily="Consolas" > Please close any running executables launched from the previous submission to continue!</Label>
+            <Label FontSize="20" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Top" VerticalAlignment="Stretch"  Foreground="Yellow"  FontFamily="Consolas" >Please close any running executables launched from the previous submission to continue!</Label>
         </Grid>
-           </Grid>
+    </Grid>
 </UserControl>

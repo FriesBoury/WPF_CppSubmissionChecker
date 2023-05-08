@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace CppSubmissionChecker_ViewModel
 {
-    public class UserItem : ViewModelBase
+    public class UserItem : ViewmodelBase
     {
         private bool _isSelected;
 

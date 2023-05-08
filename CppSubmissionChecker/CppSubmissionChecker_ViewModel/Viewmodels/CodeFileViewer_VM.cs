@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel
 {
-    public class CodeFile_VM : ViewModelBase
+    public class CodeFile_VM : ViewmodelBase
     {
+
         private bool _enableEditing;
 
         public event EventHandler? Closed;
@@ -30,8 +31,10 @@ namespace CppSubmissionChecker_ViewModel
             Closed?.Invoke(this, EventArgs.Empty);
         }
     }
-    public class CodeFileViewer_VM : ViewModelBase
+    public class CodeFileViewer_VM : ViewmodelBase
     {
+        private static readonly string[] _codeFileExtensions = new string[] { ".cs", ".h", ".cpp" };
+
         public ObservableCollection<CodeFile_VM> CodeFiles { get; private set; } = new ObservableCollection<CodeFile_VM>();
         public CodeFile_VM? SelectedCodeFile { get; set; }
         public void AddCodeFile(string? path)
@@ -72,15 +75,8 @@ namespace CppSubmissionChecker_ViewModel
             {
                 return false;
             }
-            if (path.EndsWith(".cpp"))
-            {
-                return true;
-            }
-            if (path.EndsWith(".h"))
-            {
-                return true;
-            }
-            return false;
+            return _codeFileExtensions.Any(ext => path.EndsWith(ext));
+            
         }
         private void CodeFile_Closed(object? sender, EventArgs e)
         {

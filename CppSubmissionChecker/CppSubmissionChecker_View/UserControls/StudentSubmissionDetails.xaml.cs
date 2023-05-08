@@ -15,7 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-
+using System.Windows.Threading;
 
 namespace CppSubmissionChecker_View.UserControls
 {
@@ -66,6 +66,7 @@ namespace CppSubmissionChecker_View.UserControls
             {
                 _submissionViewModel.FinishedLoading += _submissionViewModel_FinishedLoading;
                 _submissionViewModel.UnloadRequested += _submissionViewModel_Unloaded;
+                _submissionViewModel.SetMainDispatcher(new ViewmodelDispatcher(this.Dispatcher));
             }
             _console.Text = "";
             _console2.Text = "";
@@ -153,6 +154,7 @@ namespace CppSubmissionChecker_View.UserControls
             _codeViewer.OpenFile(path);
         }
 
+        //TODO: Move to VM
         private async void BuildAndRun_Click(object sender, RoutedEventArgs e)
         {
             

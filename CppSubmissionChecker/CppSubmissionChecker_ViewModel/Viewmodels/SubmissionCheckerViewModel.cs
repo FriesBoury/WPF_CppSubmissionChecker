@@ -9,16 +9,13 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel
 {
-    public class SubmissionCheckerViewModel : ViewModelBase
+    public class SubmissionCheckerViewModel : ViewmodelBase
     {
         public event Action<Exception>? ExceptionFired;
         private MultiSubmissionZipArchive? _selectedArchive;
         public bool HasData => _selectedArchive != null;
 
-        public void SetMainDispatcher(IDispatcher dispatcher)
-        {
-            MainDispatcher = dispatcher;
-        }
+       
         public MultiSubmissionZipArchive? SelectedArchive
         {
             get => _selectedArchive;

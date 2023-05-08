@@ -35,14 +35,14 @@ namespace CppSubmissionChecker_View.Windows
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            
+
             if (_viewModel == null || !_viewModel.IsValid)
             {
-                if(MessageBox.Show("Preferences are not configured correctly. Do you want to exit the application?", "Close", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                if (MessageBox.Show("Preferences are not configured correctly. Do you want to exit the application?", "Close", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
                 {
                     e.Cancel = true;
                 }
-              
+
             }
             base.OnClosing(e);
         }
@@ -59,7 +59,7 @@ namespace CppSubmissionChecker_View.Windows
             openFileDialog.IsFolderPicker = true;
             openFileDialog.InitialDirectory = "%ProgramFiles%";
             openFileDialog.Title = "Select Visual Studio Directory";
-                      
+
             if (openFileDialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 string fileName = openFileDialog.FileName;
@@ -69,7 +69,7 @@ namespace CppSubmissionChecker_View.Windows
 
         private void SelectTempFolder_Click(object sender, RoutedEventArgs e)
         {
-            if (_viewModel == null) 
+            if (_viewModel == null)
                 return;
             CommonOpenFileDialog openFileDialog = new CommonOpenFileDialog();
             openFileDialog.Multiselect = false;
@@ -84,6 +84,29 @@ namespace CppSubmissionChecker_View.Windows
             {
                 string fileName = openFileDialog.FileName;
                 _viewModel.TempFolderPath = fileName;
+            }
+        }
+
+        private void SelectUnityInstallation_Click(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel == null)
+                return;
+            CommonOpenFileDialog openFileDialog = new CommonOpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.IsFolderPicker = true;
+            openFileDialog.InitialDirectory = "%ProgramFiles%";
+            openFileDialog.Title = "Select Unity Directory";
+
+            if (openFileDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+
+                string fileName = openFileDialog.FileName;
+                fileName += "\\Unity.exe";
+
+                if (File.Exists(fileName))
+                {
+                    _viewModel.UnityInstallation = fileName;
+                }
             }
         }
     }

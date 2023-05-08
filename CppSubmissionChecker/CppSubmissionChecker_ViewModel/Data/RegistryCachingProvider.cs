@@ -21,7 +21,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             }
 
         }
-        public string GetString(string key)
+        public string? GetString(string key)
         {
             var value = _userPrefs.GetValue(key)?.ToString();
             if (value != null)
@@ -31,7 +31,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             return null;
         }
 
-        public Task<string> GetStringAsync(string key)
+        public Task<string?> GetStringAsync(string key)
         {
             return Task.FromResult(GetString(key));
         }
