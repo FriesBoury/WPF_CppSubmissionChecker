@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <StartupObject>CppSubmissionChecker_View.App</StartupObject>
@@ -11,10 +11,16 @@
 
   <ItemGroup>
     <None Remove="Resources\CSharp_Dark.xml" />
+    <None Remove="Resources\images\pause.png" />
+    <None Remove="Resources\images\play.png" />
+    <None Remove="Resources\images\stop.png" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\CSharp_Dark.xml" />
+    <Resource Include="Resources\images\pause.png" />
+    <Resource Include="Resources\images\play.png" />
+    <Resource Include="Resources\images\stop.png" />
   </ItemGroup>
 
   <ItemGroup>

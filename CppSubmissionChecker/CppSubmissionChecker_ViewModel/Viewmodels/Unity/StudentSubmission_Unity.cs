@@ -21,7 +21,7 @@ namespace CppSubmissionChecker_ViewModel.Unity
         }
         public StudentSubmission_Unity() : base()
         {
-         
+
         }
 
         public void OpenProject()

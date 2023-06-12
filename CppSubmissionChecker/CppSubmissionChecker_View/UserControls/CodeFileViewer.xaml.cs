@@ -1,4 +1,5 @@
 ﻿using CppSubmissionChecker_ViewModel;
+using CppSubmissionChecker_ViewModel.Viewmodels.FilePreview;
 using ICSharpCode.AvalonEdit;
 using ICSharpCode.AvalonEdit.Highlighting;
 using MahApps.Metro.Controls;
@@ -28,7 +29,6 @@ namespace CppSubmissionChecker_View.UserControls
     public partial class CodeFileViewer : UserControl
     {
         private CodeFileViewer_VM? _viewModel;
-        private static IHighlightingDefinition? _syntaxHighlighting = null;
         public CodeFileViewer()
         {
             this.DataContextChanged += CodeFileViewer_DataContextChanged;
@@ -60,13 +60,16 @@ namespace CppSubmissionChecker_View.UserControls
                 if(visual.DataContext is CodeFile_VM fileVm)
                 {
                     fileVm.Close();
-                    if(_viewModel.CodeFiles.Count == 0)
+                    if(_viewModel != null && _viewModel.CodeFiles.Count == 0)
                     {
                         _emptyTabControl.Visibility = Visibility.Visible;
                     }
                 }
             }
         }
+
+        #region CodeFile
+        private static IHighlightingDefinition? _syntaxHighlighting = null;
 
         private void LoadAvalonEditSyntaxHighlighting()
         {
@@ -100,7 +103,7 @@ namespace CppSubmissionChecker_View.UserControls
         private void _fileTxt_Loaded(object sender, RoutedEventArgs e)
         {
             LoadAvalonEditSyntaxHighlighting();
-            
+
             if (sender is TextEditor txtEditor && txtEditor.DataContext is string fileContent)
             {
                 txtEditor.Text = fileContent;
@@ -109,13 +112,12 @@ namespace CppSubmissionChecker_View.UserControls
             }
 
         }
-
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             string? path = ((sender as FrameworkElement)?.DataContext as CodeFile_VM)?.Path;
             string? text = (sender as FrameworkElement)?.Parent.FindChild<TextEditor>()?.Text;
 
-            if(!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(text))
+            if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(text))
             {
                 File.WriteAllText(path, text);
             }
@@ -131,5 +133,7 @@ namespace CppSubmissionChecker_View.UserControls
             process.StartInfo.Arguments = "/select,  " + $"\"{path}\"";
             process.Start();
         }
+        #endregion
+
     }
 }

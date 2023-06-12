@@ -166,7 +166,7 @@ namespace CppSubmissionChecker_ViewModel
                             long totalSize = archive.TotalUncompressSize;
                             long readSize = 0;
                             var reader = archive.ExtractAllEntries();
-
+                            
                             while (reader.MoveToNextEntry())
                             {
 

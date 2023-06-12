@@ -7,14 +7,14 @@
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks" 
              xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel;assembly=CppSubmissionChecker_ViewModel"
+             xmlns:previewVM="clr-namespace:CppSubmissionChecker_ViewModel.Viewmodels.FilePreview;assembly=CppSubmissionChecker_ViewModel"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>
         <vm:CodeFileViewer_VM/>
     </UserControl.DataContext>
     <UserControl.Resources>
-        <DataTemplate x:Key="_headerTemplate" DataType="{x:Type vm:CodeFile_VM}">
-
+        <DataTemplate x:Key="_headerTemplate" DataType="{x:Type previewVM:CodeFile_VM}">
             <Grid>
                 <Label Content="{Binding FileName}" Margin="0 0 22 0" FontFamily="Consolas" Cursor="Hand" Foreground="{StaticResource TextBrush}"></Label>
                 <Button BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Right" Width="20" Height="20" Click="File_Close" Padding="0">
@@ -22,9 +22,8 @@
                 </Button>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="_fileTemplate" DataType="{x:Type vm:CodeFile_VM}">
+        <DataTemplate  DataType="{x:Type previewVM:CodeFile_VM}">
             <Grid>
-
                 <avalon:TextEditor DataContext="{Binding FileContent}" 
                                     Background="#1e1e1e"
                                     Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
@@ -37,15 +36,25 @@
                                     Text="">
                 </avalon:TextEditor>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                <Button Click="ShowInExplorer_Click" >Show in Explorer</Button>
-                <Button Click="Save_Click" >Save</Button>
+                    <Button Click="ShowInExplorer_Click" >Show in Explorer</Button>
+                    <Button Click="Save_Click" >Save</Button>
                 </StackPanel>
+            </Grid>
+        </DataTemplate >
+        <DataTemplate DataType="{x:Type previewVM:MediaFile_VM}">
+            <Grid>
+                <local:VideoPlayer DataContext="{Binding}"/>
+                
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
-        <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource  _headerTemplate}" ContentTemplate="{StaticResource _fileTemplate}">
-
+        <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource _headerTemplate}">
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <UserControl Content="{Binding}"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
         <TabControl DockPanel.Dock="Left" Name ="_emptyTabControl" Visibility="Hidden" >
             <TabItem Header="File Viewer" Name="_fileViewerTabItem" >

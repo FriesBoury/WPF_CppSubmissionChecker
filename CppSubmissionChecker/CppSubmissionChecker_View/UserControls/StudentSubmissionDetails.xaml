@@ -124,7 +124,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
                                         <CheckBox VerticalAlignment="Center" ToolTip="Keep open" IsChecked="{Binding IsMarked}"></CheckBox>
-                                        <icons:PackIconMaterial Grid.Column="1" VerticalAlignment="Center"  Kind="FileOutline" Foreground="{StaticResource PrimaryColorBrush}" Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}"/>
+                                        <icons:PackIconMaterial Grid.Column="1" VerticalAlignment="Center"  Kind="FileOutline" Foreground="{StaticResource PrimaryColorBrush}"/>
                                         <Label Grid.Column="2" Content="{Binding Name}" />
                                     </Grid>
 
