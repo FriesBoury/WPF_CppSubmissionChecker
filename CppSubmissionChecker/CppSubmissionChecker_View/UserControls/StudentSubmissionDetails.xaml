@@ -51,12 +51,12 @@
                             </Button>
                         </StackPanel>
                         <!-- output windows-->
-                        <TabControl VerticalAlignment="Stretch" Name="_tabcontrol">
+                        <TabControl VerticalAlignment="Stretch" Name="_tabcontrol" SelectedIndex="{Binding SelectedOutputTabIndex}">
                             <TabItem Header="Build output">
                                 <local:TextLog DataContext="{Binding BuildOutput}"></local:TextLog>
                             </TabItem>
                             <TabItem Header="Execution output">
-                                <local:TextLog DataContext="{Binding ExecutionOutput}"></local:TextLog>
+                                <local:TextLog DataContext="{Binding BuildExecutionOutput}"></local:TextLog>
                             </TabItem>
                         </TabControl>
                     </DockPanel>

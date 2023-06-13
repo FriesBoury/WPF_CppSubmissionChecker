@@ -31,7 +31,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
         public int SelectedOutputTabIndex
         {
-            get => _selectedOutputTab; private set
+            get => _selectedOutputTab;
+            set
             {
                 _selectedOutputTab = value;
                 OnPropertyChanged(nameof(SelectedOutputTabIndex));
@@ -70,6 +71,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                         }
                     });
                     _runningProcesses.Remove(process);
+
                     if (executablePath != null)
                     {
                         SelectedOutputTabIndex = 1;
@@ -107,13 +109,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
             process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
             {
-
-
-                if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data + "\n");
-                if (receivedOutput != null)
-                {
-                    receivedOutput(e.Data);
-                }
+                if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data);
+                receivedOutput?.Invoke(e.Data);
             });
             process.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
             {
