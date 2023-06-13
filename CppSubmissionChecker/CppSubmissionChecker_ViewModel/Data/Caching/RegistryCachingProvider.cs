@@ -1,11 +1,13 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace CppSubmissionChecker_ViewModel.DataClasses
+namespace CppSubmissionChecker_ViewModel.Data.Caching
 {
     internal class RegistryCachingProvider : ICachingProvider
     {

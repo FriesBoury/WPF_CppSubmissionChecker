@@ -15,7 +15,7 @@ namespace CppSubmissionChecker_ViewModel
             FilePreviewBaseVM? existing = CodeFiles.FirstOrDefault(x => x.Path == path);
             if (existing == null)
             {
-                FilePreviewBaseVM file = _previewFactory.BuildFilePreviewVM(path);
+                FilePreviewBaseVM? file = _previewFactory.BuildFilePreviewVM(path);
                 if (file == null) return;
 
                 file.Closed += CodeFile_Closed;

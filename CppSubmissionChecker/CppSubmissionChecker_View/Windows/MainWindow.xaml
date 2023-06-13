@@ -24,8 +24,19 @@
         <Grid>
             <StackPanel Visibility="{Binding HasData, Converter={StaticResource BoolToInvisibility}}" Orientation="Vertical" >
 
-                <Label VerticalAlignment="Center" HorizontalAlignment="Center">No Archive selected</Label>
-                <Button HorizontalAlignment="Center" Click="LoadZip_Click">Load Zip Archive</Button>
+                <Label HorizontalAlignment="Center">Project Type:</Label>
+                <ComboBox ItemsSource="{Binding SubmissionFactory.TypeNames}" SelectedItem="{Binding SubmissionFactory.SelectedType}" HorizontalAlignment="Center" Width="200"/>
+                <Button HorizontalAlignment="Center" Click="LoadZip_Click">
+                    <Button.ToolTip>
+                        <Grid Background="{StaticResource CustomDarkGrey}" Margin="-10">
+                        <StackPanel Orientation="Vertical"  Margin="10" Width="200">
+                                <TextBlock TextWrapping="Wrap" Foreground="White">A zip with all the submissions as downloaded from LEHO:</TextBlock>
+                                <Image Source="/Resources/images/tooltip_submissionszip.png"  HorizontalAlignment="Left"/>
+                        </StackPanel>
+                        </Grid>
+                    </Button.ToolTip>
+                    Load Zip Archive</Button>
+                
 
             </StackPanel>
             <DockPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" LastChildFill="true" >

@@ -1,5 +1,5 @@
 ﻿using CppSubmissionChecker_ViewModel.Data;
-using CppSubmissionChecker_ViewModel.Unity;
+using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -61,7 +61,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         }
 
         //Constructor
-        public MultiSubmissionZipArchive(ZipArchive archive)
+        public MultiSubmissionZipArchive(ZipArchive archive, SubmissionFactory submissionFactory)
         {
             _zipArchive = archive;
             _studentSubmissions = new List<StudentSubmission>();
@@ -73,7 +73,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
                     continue;
                 }
                 string name = entry.Name;
-                StudentSubmissions.Add(new StudentSubmission_Unity(name, entry));
+                StudentSubmissions.Add(submissionFactory.CreateSubmission(name, entry));
             }
 
             StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();

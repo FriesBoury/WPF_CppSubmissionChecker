@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CppSubmissionChecker_ViewModel
+namespace CppSubmissionChecker_ViewModel.Data.Caching
 {
 
     public interface ICachingProvider

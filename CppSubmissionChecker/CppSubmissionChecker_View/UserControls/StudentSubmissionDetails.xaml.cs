@@ -1,4 +1,5 @@
 ﻿using CppSubmissionChecker_ViewModel;
+using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ namespace CppSubmissionChecker_View.UserControls
 
         StudentSubmission? _submissionViewModel;
 
-        private List<Process> _runningProcesses = new List<Process>();
+
         public StudentSubmissionDetails()
         {
             this.DataContextChanged += StudentSubmissionDetails_DataContextChanged;
@@ -68,8 +69,7 @@ namespace CppSubmissionChecker_View.UserControls
                 _submissionViewModel.UnloadRequested += _submissionViewModel_Unloaded;
                 _submissionViewModel.SetMainDispatcher(new ViewmodelDispatcher(this.Dispatcher));
             }
-            _console.Text = "";
-            _console2.Text = "";
+
             _codeViewer?.CloseAllFiles();
 
 
@@ -83,15 +83,8 @@ namespace CppSubmissionChecker_View.UserControls
         async void UnloadSubmission(StudentSubmission submission)
         {
             submission.IsUnloading = true;
-            for(int i= _runningProcesses.Count-1; i >= 0; --i)
-            {
-                _runningProcesses[i].Kill();
-            }
-           
-            while (_runningProcesses.Count > 0)
-            {
-                await Task.Delay(1000);
-            }
+
+            await submission.KillRunningProcesses();
             
             submission.Loaded = false;
             submission.IsUnloading = false;
@@ -155,106 +148,6 @@ namespace CppSubmissionChecker_View.UserControls
         }
 
         //TODO: Move to VM
-        private async void BuildAndRun_Click(object sender, RoutedEventArgs e)
-        {
-            
-            try
-            {
-                if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
-                {
-
-                    _tabcontrol.SelectedIndex = 0;
-                    _console.Text = "";
-                    _console2.Text = "";
-                    string? executablePath = null;
-                    Process process = new Process();
-                    process.StartInfo.FileName = Preferences.MSBuildPath;
-                    process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
-                    if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
-                    {
-                        process.StartInfo.Arguments += " " + Preferences.BuildParams;
-                    }
-                    _runningProcesses.Add(process);
-                    await RunAndMonitorProcess(process, _console, true, (outputLine) =>
-                    {
-                        if (outputLine != null && outputLine.Contains(".exe") && outputLine.Contains("->"))
-                        {
-                            executablePath = outputLine;
-                            TrimExecutablePath(ref executablePath);
-                        }
-                    });
-                    _runningProcesses.Remove(process);
-                    if (executablePath != null)
-                    {
-                        _tabcontrol.SelectedIndex = 1;
-                        //Run the build
-                        Process runProcess = new Process();
-                        _runningProcesses.Add(process);
-                        runProcess.StartInfo.FileName = executablePath;
-                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(_submissionViewModel.SelectedSolutionPath);
-                        await RunAndMonitorProcess(runProcess, _console2, true, null);
-                        _runningProcesses.Remove(process);
-                    }
-
-
-                }
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show("Build and Run encountered an exception: " + exc.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-            }
-        }
-
-        private async Task RunAndMonitorProcess(Process process, TextBox console, bool hideConsole, Action<string?>? receivedOutput)
-        {
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = hideConsole;
-            process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-            console.Clear();
-
-            Action<string> appendText = (txt) => { console.AppendText(txt); };
-
-            process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
-            {
-
-                Dispatcher.Invoke(() =>
-                {
-                    if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data + "\n");
-                });
-                if (receivedOutput != null)
-                {
-                    receivedOutput(e.Data);
-                }
-            });
-            process.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
-            {
-
-                Dispatcher.Invoke(() => { if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data); });
-
-            });
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-
-            await process.WaitForExitAsync();
-
-        }
-
-        private void TrimExecutablePath(ref string executablePath)
-        {
-            int exeIndex = executablePath.IndexOf(".exe");
-            int beforeExeIndex = executablePath.IndexOf("->", 0, exeIndex);
-            if (beforeExeIndex != -1)
-            {
-                beforeExeIndex += 3;
-                executablePath = executablePath.Substring(beforeExeIndex, exeIndex - beforeExeIndex + 4);
-            }
-            
-        }
 
         private async void OpenInVS_Click(object sender, RoutedEventArgs e)
         {
@@ -263,11 +156,8 @@ namespace CppSubmissionChecker_View.UserControls
                 Process process = new Process();
                 process.StartInfo.FileName = Preferences.VisualStudioPath;
                 process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
-                _runningProcesses.Add(process);
-                process.Start();
-                await process.WaitForExitAsync();
-
-                _runningProcesses.Remove(process);
+                await _submissionViewModel?.RunProcessAsync(process);
+             
 
             }
         }

@@ -14,6 +14,7 @@
     <None Remove="Resources\images\pause.png" />
     <None Remove="Resources\images\play.png" />
     <None Remove="Resources\images\stop.png" />
+    <None Remove="Resources\images\tooltip_submissionszip.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
     <Resource Include="Resources\images\pause.png" />
     <Resource Include="Resources\images\play.png" />
     <Resource Include="Resources\images\stop.png" />
+    <Resource Include="Resources\images\tooltip_submissionszip.png" />
   </ItemGroup>
 
   <ItemGroup>

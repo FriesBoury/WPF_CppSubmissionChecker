@@ -4,14 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel;assembly=CppSubmissionChecker_ViewModel"
-             xmlns:vmUnity="clr-namespace:CppSubmissionChecker_ViewModel.Unity;assembly=CppSubmissionChecker_ViewModel"
+             xmlns:vmUnity="clr-namespace:CppSubmissionChecker_ViewModel.Viewmodels.Submissions;assembly=CppSubmissionChecker_ViewModel"
              xmlns:local="clr-namespace:CppSubmissionChecker_View.UserControls"
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="768" d:DesignWidth="1028">
     <d:UserControl.DataContext>
-        <vmUnity:StudentSubmission_Unity></vmUnity:StudentSubmission_Unity>
+        <vmUnity:StudentSubmission/>
     </d:UserControl.DataContext>
     <Grid>
         <DockPanel LastChildFill="true">
@@ -52,15 +52,11 @@
                         </StackPanel>
                         <!-- output windows-->
                         <TabControl VerticalAlignment="Stretch" Name="_tabcontrol">
-                            <TabItem Header="Build output" >
-                                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontFamily="Consolas" x:Name="_console" Background="Black" Foreground="White" IsReadOnly="True">
-
-                                </TextBox>
+                            <TabItem Header="Build output">
+                                <local:TextLog DataContext="{Binding BuildOutput}"></local:TextLog>
                             </TabItem>
                             <TabItem Header="Execution output">
-                                <TextBox VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap" FontFamily="Consolas" x:Name="_console2"  Background="Black" Foreground="White" IsReadOnly="True">
-
-                                </TextBox>
+                                <local:TextLog DataContext="{Binding ExecutionOutput}"></local:TextLog>
                             </TabItem>
                         </TabControl>
                     </DockPanel>

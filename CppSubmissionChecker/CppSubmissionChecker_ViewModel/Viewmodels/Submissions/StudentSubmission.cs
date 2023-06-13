@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using CppSubmissionChecker_ViewModel;
 using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Interfaces;
 using CppSubmissionChecker_ViewModel.Viewmodels.TextLog;
@@ -16,10 +15,10 @@ using System.IO.Compression;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace CppSubmissionChecker_ViewModel
+namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
 
-    public class StudentSubmission : ViewmodelBase
+    public abstract class StudentSubmission : ViewmodelBase
     {
         public event Action<StudentSubmission>? UnloadRequested;
         public event Action? FinishedLoading;
@@ -34,10 +33,10 @@ namespace CppSubmissionChecker_ViewModel
         public ObservableCollection<string> SolutionPaths { get; private set; } = new ObservableCollection<string>();
         public ObservableCollection<Executable> Executables { get; private set; } = new ObservableCollection<Executable>();
 
+
         //To override in inherited classes
         public string OpenProjectCommandText { get; private set; } = "Build and Run";
         public RelayCommand? OpenProjectCommand { get; private set; }
-
 
 
         public TextLog_VM ExecutionOutput
@@ -101,9 +100,17 @@ namespace CppSubmissionChecker_ViewModel
             }
 
         }
+
+        public virtual Task KillRunningProcesses()
+        {
+            return Task.CompletedTask;
+        }
+
         public virtual async Task Unload()
         {
             UnloadRequested?.Invoke(this);
+
+
             while (Loaded)
             {
                 await Task.Delay(1000);
@@ -166,7 +173,7 @@ namespace CppSubmissionChecker_ViewModel
                             long totalSize = archive.TotalUncompressSize;
                             long readSize = 0;
                             var reader = archive.ExtractAllEntries();
-                            
+
                             while (reader.MoveToNextEntry())
                             {
 
@@ -239,6 +246,7 @@ namespace CppSubmissionChecker_ViewModel
 
                 MainDispatcher?.Invoke(() =>
                 {
+                    SolutionPaths.Clear();
                     Executables.Clear();
                     foreach (string exe in executables)
                     {
@@ -278,7 +286,7 @@ namespace CppSubmissionChecker_ViewModel
         {
             if (exe == null)
                 return;
-            if (String.IsNullOrEmpty(exe.FullPath))
+            if (string.IsNullOrEmpty(exe.FullPath))
                 return;
 
             ProcessStartInfo p = new ProcessStartInfo(exe.FullPath);
@@ -372,6 +380,7 @@ namespace CppSubmissionChecker_ViewModel
             return null;
         }
 
+        public abstract Task RunProcessAsync(Process process);
     }
 }
 

@@ -36,12 +36,15 @@ namespace CppSubmissionChecker_View.UserControls
                 _viewModel.AppendedLine -= _viewModel_AppendedLine;
                 _viewModel.Cleared -= _viewModel_Cleared;
             }
-
+            console?.Clear();
+        
+          
             _viewModel = DataContext as TextLog_VM;
             if (_viewModel != null)
             {
                 _viewModel.AppendedLine += _viewModel_AppendedLine;
-                _viewModel.Cleared += _viewModel_Cleared; 
+                _viewModel.Cleared += _viewModel_Cleared;
+                console?.AppendText(_viewModel?.ToString());
             }
         }
 

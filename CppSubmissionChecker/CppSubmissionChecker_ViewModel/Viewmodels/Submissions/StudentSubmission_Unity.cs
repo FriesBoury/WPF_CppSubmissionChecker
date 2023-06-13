@@ -8,13 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CppSubmissionChecker_ViewModel.Unity
+namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
     public class StudentSubmission_Unity : StudentSubmission
     {
         new public string OpenProjectCommandText { get; private set; } = "Open In Unity";
         new public RelayCommand? OpenProjectCommand { get; private set; }
-
+        private List<Process> _runningProcesses = new List<Process>();
         public StudentSubmission_Unity(string name, ZipArchiveEntry entry) : base(name, entry)
         {
             OpenProjectCommand = new RelayCommand(OpenProject);
@@ -26,16 +26,16 @@ namespace CppSubmissionChecker_ViewModel.Unity
 
         public void OpenProject()
         {
-            if (this.FullDirPath == null) return;
+            if (FullDirPath == null) return;
 
             string projectDir = string.Empty;
-            if (this.SolutionPaths.Any())
+            if (SolutionPaths.Any())
             {
-                projectDir = this.SolutionPaths.First();
+                projectDir = SolutionPaths.First();
             }
             else
             {
-                var assetsDir = FindSubDirectory(this.FullDirPath, "Assets");
+                var assetsDir = FindSubDirectory(FullDirPath, "Assets");
                 if (string.IsNullOrEmpty(assetsDir))
                 {
                     return;
@@ -58,6 +58,28 @@ namespace CppSubmissionChecker_ViewModel.Unity
             //return base.Unload();
         }
 
+
+        public override async Task RunProcessAsync(Process process)
+        {
+            _runningProcesses.Add(process);
+            process.Start();
+            await process.WaitForExitAsync();
+
+            _runningProcesses.Remove(process);
+        }
+
+        public override async Task KillRunningProcesses()
+        {
+            for (int i = _runningProcesses.Count - 1; i >= 0; --i)
+            {
+                _runningProcesses[i].Kill();
+            }
+
+            while (_runningProcesses.Count > 0)
+            {
+                await Task.Delay(1000);
+            }
+        }
 
     }
 }

@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Navigation;
 
-namespace CppSubmissionChecker_View
+namespace CppSubmissionChecker_View.Converters
 {
     class BoolToVisibilityConverter : IValueConverter
     {

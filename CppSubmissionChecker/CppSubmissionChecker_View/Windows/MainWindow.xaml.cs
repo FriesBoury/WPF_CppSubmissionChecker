@@ -1,6 +1,7 @@
 ﻿using CppSubmissionChecker_View.Windows;
 using CppSubmissionChecker_ViewModel;
 using CppSubmissionChecker_ViewModel.DataClasses;
+using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
