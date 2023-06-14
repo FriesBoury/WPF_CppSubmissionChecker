@@ -9,8 +9,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
 {
     public class FilePreviewFactory
     {
-        private static readonly string[] _codeFileExtensions = new string[] { ".cs", ".h", ".cpp", ".json", ".txt", ".xaml" };
-        private static readonly string[] _mediaFileExtensions = new string[] { ".mp4", ".mov", "mkv" };
+        private static readonly string[] _codeFileExtensions = new string[] { ".cs", ".h", ".cpp", ".json", ".txt", ".xaml", ".htm", ".url" };
+        private static readonly string[] _mediaFileExtensions = new string[] { ".mp4", ".mov", ".mkv" };
 
         public FilePreviewBaseVM? BuildFilePreviewVM(string filePath)
         {

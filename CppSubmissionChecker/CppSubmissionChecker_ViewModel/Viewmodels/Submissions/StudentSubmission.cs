@@ -166,7 +166,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     else if (_archiveEntry.Name.EndsWith(".rar"))
                     {
                         string tempPath = Path.GetFullPath(Path.Combine(dirPath, _archiveEntry.Name));
-                        _archiveEntry.ExtractToFile(tempPath);
+                        _archiveEntry.ExtractToFile(tempPath, true);
 
                         using (RarArchive archive = RarArchive.Open(tempPath))
                         {
@@ -186,11 +186,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                                 }
                             };
                         }
+
                     }
                     else if (_archiveEntry.Name.EndsWith(".7z"))
                     {
                         string tempPath = Path.GetFullPath(Path.Combine(dirPath, _archiveEntry.Name));
-                        _archiveEntry.ExtractToFile(tempPath);
+                        _archiveEntry.ExtractToFile(tempPath,true);
                         using (SevenZipArchive archive = SevenZipArchive.Open(tempPath))
                         {
                             long totalSize = archive.TotalUncompressSize;
@@ -211,11 +212,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                         }
 
                     }
-                    else
+                    else //not an archive -> extract to file
                     {
-                        FullDirPath = Path.GetFullPath(Path.Combine(dirPath, archiveName));
-                        FullDirPath = Regex.Replace(FullDirPath, @"[^0-9a-zA-Z\._\\/:]", "");
-                        _archiveEntry.ExtractToFile(FullDirPath);
+                        string tempPath = Path.GetFullPath(Path.Combine(FullDirPath, _archiveEntry.Name));
+                        _archiveEntry.ExtractToFile(tempPath, true);            
+
+                       
                     }
                 }
             }
