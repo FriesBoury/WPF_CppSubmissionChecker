@@ -25,7 +25,7 @@ namespace CppSubmissionChecker_ViewModel.Data.Caching
         }
         public string? GetString(string key)
         {
-            var value = _userPrefs.GetValue(key)?.ToString();
+            var value = _userPrefs?.GetValue(key)?.ToString();
             if (value != null)
             {
                 return value;

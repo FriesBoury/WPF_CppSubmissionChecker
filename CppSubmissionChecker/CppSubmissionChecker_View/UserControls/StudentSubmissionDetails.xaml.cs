@@ -25,7 +25,6 @@ namespace CppSubmissionChecker_View.UserControls
     /// </summary>
     public partial class StudentSubmissionDetails : UserControl
     {
-        List<string> _markedFiles = new List<string>(20);
 
         StudentSubmission? _submissionViewModel;
 
@@ -39,27 +38,10 @@ namespace CppSubmissionChecker_View.UserControls
 
         private void StudentSubmissionDetails_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-
-            _markedFiles.Clear();
             if (_submissionViewModel != null)
             {
                 _submissionViewModel.FinishedLoading -= _submissionViewModel_FinishedLoading;
                 _submissionViewModel.UnloadRequested -= _submissionViewModel_Unloaded;
-                if (_submissionViewModel.DirectoryTree != null && !string.IsNullOrEmpty(_submissionViewModel.FullDirPath))
-                {
-                    FindAllMarkedFiles(ref _markedFiles, _submissionViewModel.DirectoryTree);
-                    string rootDir = _submissionViewModel.FullDirPath;
-
-                    for (int i = 0; i < _markedFiles.Count; ++i)
-                    {
-                        int sourceIndex = _markedFiles[i].IndexOf(Preferences.ProjectRootFolderName, StringComparison.InvariantCultureIgnoreCase);
-                        if (sourceIndex >= 0)
-                        {
-
-                            _markedFiles[i] = _markedFiles[i].Substring(sourceIndex);
-                        }
-                    }
-                }
             }
 
             _submissionViewModel = DataContext as StudentSubmission;
@@ -85,7 +67,7 @@ namespace CppSubmissionChecker_View.UserControls
             submission.IsUnloading = true;
 
             await submission.KillRunningProcesses();
-            
+
             submission.Loaded = false;
             submission.IsUnloading = false;
         }
@@ -94,39 +76,22 @@ namespace CppSubmissionChecker_View.UserControls
         {
             if (_submissionViewModel?.DirectoryTree != null)
             {
-                OpenAllMarkedFiles(ref _markedFiles, _submissionViewModel.DirectoryTree);
+                OpenAllMarkedFiles(_submissionViewModel.DirectoryTree);
             }
         }
 
-        private void FindAllMarkedFiles(ref List<string> markedFiles, UserDirectory dir)
+        private void OpenAllMarkedFiles(UserDirectory dir)
         {
             foreach (var file in dir.Files)
             {
                 if (file.IsMarked)
                 {
-                    markedFiles.Add(file.FilePath);
-                }
-            }
-            foreach (var subDir in dir.Subfolders)
-            {
-                FindAllMarkedFiles(ref markedFiles, subDir);
-            }
-        }
-        private void OpenAllMarkedFiles(ref List<string> markedFiles, UserDirectory dir)
-        {
-            foreach (var file in dir.Files)
-            {
-                string? fileMatch = markedFiles.FirstOrDefault(x => file.FilePath.EndsWith(x, StringComparison.InvariantCultureIgnoreCase));
-                if (fileMatch != null)
-                {
-                    markedFiles.Remove(fileMatch);
-                    file.IsMarked = true;
                     _codeViewer.OpenFile(file.FilePath);
                 }
             }
             foreach (var subDir in dir.Subfolders)
             {
-                OpenAllMarkedFiles(ref markedFiles, subDir);
+                OpenAllMarkedFiles(subDir);
             }
         }
 
@@ -157,7 +122,7 @@ namespace CppSubmissionChecker_View.UserControls
                 process.StartInfo.FileName = Preferences.VisualStudioPath;
                 process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
                 await _submissionViewModel?.RunProcessAsync(process);
-             
+
 
             }
         }

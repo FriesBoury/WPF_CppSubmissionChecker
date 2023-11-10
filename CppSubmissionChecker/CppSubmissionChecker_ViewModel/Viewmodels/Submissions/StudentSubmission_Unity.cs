@@ -15,7 +15,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         new public string OpenProjectCommandText { get; private set; } = "Open In Unity";
         new public RelayCommand? OpenProjectCommand { get; private set; }
         private List<Process> _runningProcesses = new List<Process>();
-        public StudentSubmission_Unity(string name, ZipArchiveEntry entry) : base(name, entry)
+        public StudentSubmission_Unity(string name, ZipArchiveEntry entry, MarkedFileTracker tracker) : base(name, entry, tracker)
         {
             OpenProjectCommand = new RelayCommand(OpenProject);
         }

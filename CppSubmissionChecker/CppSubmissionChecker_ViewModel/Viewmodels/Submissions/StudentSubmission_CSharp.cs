@@ -41,7 +41,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
         private List<Process> _runningProcesses = new List<Process>();
 
-        public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry) : base(studentName, archiveEntry)
+        public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
         {
             OpenProjectCommand = new RelayCommand(BuildAndRun_Click);
         }

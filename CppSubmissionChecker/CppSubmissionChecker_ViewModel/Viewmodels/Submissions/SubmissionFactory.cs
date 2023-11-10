@@ -35,17 +35,17 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
-        public StudentSubmission CreateSubmission(string studentName, ZipArchiveEntry entry)
+        public StudentSubmission CreateSubmission(string studentName, ZipArchiveEntry entry, MarkedFileTracker tracker)
         {
             switch (SelectedType)
             {
                 default:
                 case CPP:
                 case CSHARPNET:
-                    return new StudentSubmission_CSharp(studentName, entry);
+                    return new StudentSubmission_CSharp(studentName, entry, tracker);
 
                 case UNITY:
-                    return new StudentSubmission_Unity(studentName, entry);
+                    return new StudentSubmission_Unity(studentName, entry, tracker);
             }
 
 

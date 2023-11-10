@@ -20,6 +20,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
     public abstract class StudentSubmission : ViewmodelBase
     {
+        public event Action<string, bool> FileMarkedChanged;
         public event Action<StudentSubmission>? UnloadRequested;
         public event Action? FinishedLoading;
 
@@ -53,8 +54,6 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
-
-
         public string? SelectedSolutionPath
         {
             get => _selectedSolutionPath;
@@ -65,8 +64,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
+        public MarkedFileTracker Tracker => _tracker;
+
         // Private fields
         private ZipArchiveEntry? _archiveEntry;
+        private readonly MarkedFileTracker _tracker;
         private string? _selectedSolutionPath;
         private bool _isUnloading;
 
@@ -85,9 +87,10 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             FullDirPath = "SomeDir";
             StudentName = Name.Substring(0, Name.IndexOf('_', 2));
         }
-        public StudentSubmission(string studentName, ZipArchiveEntry archiveEntry)
+        public StudentSubmission(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker)
         {
             _archiveEntry = archiveEntry;
+            _tracker = tracker;
             Name = studentName;
             int separatorIndex = Name.IndexOf('_');
             if (separatorIndex == -1)
@@ -191,7 +194,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     else if (_archiveEntry.Name.EndsWith(".7z"))
                     {
                         string tempPath = Path.GetFullPath(Path.Combine(dirPath, _archiveEntry.Name));
-                        _archiveEntry.ExtractToFile(tempPath,true);
+                        _archiveEntry.ExtractToFile(tempPath, true);
                         using (SevenZipArchive archive = SevenZipArchive.Open(tempPath))
                         {
                             long totalSize = archive.TotalUncompressSize;
@@ -215,9 +218,9 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     else //not an archive -> extract to file
                     {
                         string tempPath = Path.GetFullPath(Path.Combine(FullDirPath, _archiveEntry.Name));
-                        _archiveEntry.ExtractToFile(tempPath, true);            
+                        _archiveEntry.ExtractToFile(tempPath, true);
 
-                       
+
                     }
                 }
             }
@@ -245,7 +248,6 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 List<string> executables = new List<string>();
                 FindFilesWithExtension(FullDirPath, ".exe", ref executables);
 
-
                 MainDispatcher?.Invoke(() =>
                 {
                     SolutionPaths.Clear();
@@ -264,6 +266,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
                     SelectedSolutionPath = SolutionPaths.FirstOrDefault();
                     DirectoryTree = new UserDirectory(FullDirPath);
+                    MarkFilesInDirectory(DirectoryTree);
+                    DirectoryTree.FileMarkedChanged += DirectoryTree_FileMarkedChanged;
                     FinishedLoading?.Invoke();
                     OnPropertyChanged(nameof(DirectoryTree));
 
@@ -275,8 +279,30 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
 
             return false;
+        }
+        private bool MarkFilesInDirectory(UserDirectory directory)
+        {
+            bool markedAny = false;
+            foreach (var file in directory.Files)
+            {
+                if (_tracker.GetFileTracking(file.FilePath, this.FullDirPath!))
+                {
+                    file.IsMarked = true;
+                    markedAny = true;
+                }
+            }
+            foreach(var dir in directory.Subfolders)
+            {
+                markedAny |= MarkFilesInDirectory(dir);
+            }
 
+            directory.IsOpen = markedAny;
+            return markedAny;
+        }
 
+        private void DirectoryTree_FileMarkedChanged(string path, bool marked)
+        {
+            _tracker.SetFileTracking(path, marked, this.FullDirPath!);
         }
 
         private void Executable_Clicked(object? sender, EventArgs e)

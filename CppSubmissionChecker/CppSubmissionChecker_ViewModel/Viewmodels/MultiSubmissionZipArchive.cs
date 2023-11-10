@@ -1,4 +1,5 @@
 ﻿using CppSubmissionChecker_ViewModel.Data;
+using CppSubmissionChecker_ViewModel.Viewmodels;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         private ZipArchive _zipArchive;
         private List<StudentSubmission> _studentSubmissions;
         private StudentSubmission? _selectedStudentSubmission;
-
+        private MarkedFileTracker _markedFileTracker;
         //Public Properties
         public bool HasData => _studentSubmissions.Count > 0;
         public bool Loading { get; private set; }
@@ -65,7 +66,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         {
             _zipArchive = archive;
             _studentSubmissions = new List<StudentSubmission>();
-
+            _markedFileTracker = new MarkedFileTracker();
             foreach (var entry in archive.Entries)
             {
                 if (entry == null)
@@ -73,7 +74,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
                     continue;
                 }
                 string name = entry.Name;
-                StudentSubmissions.Add(submissionFactory.CreateSubmission(name, entry));
+                StudentSubmissions.Add(submissionFactory.CreateSubmission(name, entry, _markedFileTracker));
             }
 
             StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();

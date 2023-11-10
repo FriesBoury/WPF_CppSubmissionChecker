@@ -223,7 +223,7 @@
                         Value="true">
                                     <Setter TargetName="checkBoxBorder"
                                       Property="Background"
-                                       Value="{StaticResource CustomWhite}"/>
+                                       Value="{StaticResource BackgroundBrush}"/>
                                     <Setter TargetName="checkBoxBorder"
                                           Property="BorderBrush"
                                           Value="{StaticResource CustomWhite}" />
@@ -238,7 +238,7 @@
                                         Value="false">
                                     <Setter TargetName="checkBoxBorder"
                                           Property="Background"
-                                          Value="{StaticResource CustomWhite}" />
+                                          Value="{StaticResource BackgroundBrush}" />
                                     <Setter TargetName="checkBoxBorder"
                                           Property="BorderBrush"
                                           Value="{StaticResource CustomLightGrey}" />
@@ -253,7 +253,7 @@
                                         Value="true">
                                     <Setter TargetName="checkBoxBorder"
                                           Property="Background"
-                                          Value="{StaticResource CustomMediumGray}" />
+                                          Value="{StaticResource BackgroundBrush}" />
                                     <Setter TargetName="checkBoxBorder"
                                           Property="BorderBrush"
                                           Value="{StaticResource CustomMediumGray}" />

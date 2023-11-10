@@ -96,7 +96,7 @@
                                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="{StaticResource SecondaryColor}"/>
 
                                     </Style.Resources>
-                                    <Setter Property="IsExpanded" Value="{Binding Path=IsOpen, Mode=OneWayToSource}"></Setter>
+                                    <Setter Property="IsExpanded" Value="{Binding Path=IsOpen, Mode=TwoWay}"></Setter>
                                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
 
                                 </Style>
@@ -119,7 +119,7 @@
                                             <ColumnDefinition Width="20"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox VerticalAlignment="Center" ToolTip="Keep open" IsChecked="{Binding IsMarked}"></CheckBox>
+                                        <CheckBox VerticalAlignment="Center" ToolTip="Keep open"  Background="{StaticResource BackgroundBrush}" IsChecked="{Binding IsMarked}" Foreground="Black"></CheckBox>
                                         <icons:PackIconMaterial Grid.Column="1" VerticalAlignment="Center"  Kind="FileOutline" Foreground="{StaticResource PrimaryColorBrush}"/>
                                         <Label Grid.Column="2" Content="{Binding Name}" />
                                     </Grid>
@@ -143,5 +143,9 @@
             <Label FontSize="20" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Bottom" VerticalAlignment="Stretch" Foreground="White" FontFamily="Consolas" >Waiting for submission to be unloaded...</Label>
             <Label FontSize="20" Grid.Row="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"  VerticalContentAlignment="Top" VerticalAlignment="Stretch"  Foreground="Yellow"  FontFamily="Consolas" >Please close any running executables launched from the previous submission to continue!</Label>
         </Grid>
+
+        <!--<ListView Opacity="0.5" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                  ItemsSource="{Binding Tracker.MarkedFiles}"></ListView>-->
     </Grid>
+
 </UserControl>
