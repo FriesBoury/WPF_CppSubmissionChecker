@@ -37,12 +37,25 @@
                             </Button>
                         </Grid>
                         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                            <Button HorizontalAlignment="Left" Command="{Binding OpenProjectCommand}">
-                                <StackPanel Orientation="Horizontal">
-                                    <icons:PackIconMaterial Kind="Play" VerticalAlignment="Stretch" Foreground="Green"></icons:PackIconMaterial>
-                                    <TextBlock Text="{Binding OpenProjectCommandText}"/>
-                                </StackPanel>
-                            </Button>
+                            <ItemsControl ItemsSource="{Binding SubmissionCommands}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button HorizontalAlignment="Left" Command="{Binding Command }">
+                                            <StackPanel Orientation="Horizontal">
+                                                <icons:PackIconMaterial Kind="Play" VerticalAlignment="Stretch" Foreground="Green"></icons:PackIconMaterial>
+                                                <TextBlock Text="{Binding CommandText}"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                               
+                            </ItemsControl>
+                           
                             <Button HorizontalAlignment="Left" Click="OpenInVS_Click">
                                 <StackPanel Orientation="Horizontal">
                                     <icons:PackIconMaterial Kind="MicrosoftVisualStudio"  VerticalAlignment="Stretch" Foreground="Purple"></icons:PackIconMaterial>

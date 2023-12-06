@@ -14,11 +14,6 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
     {
         private int _selectedOutputTab;
 
-
-
-        new public string OpenProjectCommandText { get; private set; } = "Build And Run";
-        new public RelayCommand? OpenProjectCommand { get; private set; }
-
         public TextLog_VM BuildOutput
         {
             get; private set;
@@ -43,10 +38,27 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
         public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
         {
-            OpenProjectCommand = new RelayCommand(BuildAndRun_Click);
+
+            _submissionCommands.Add(new SubmissionCommand("Build And Run [Debug]", () => { BuildAndRun(false); }));
+            _submissionCommands.Add(new SubmissionCommand("Build And Run [Release]", () => { BuildAndRun(true); }));
+
         }
 
-        private async void BuildAndRun_Click()
+
+        private async void BuildAndRun(bool release)
+        {
+            if (IsCMakeProject())
+            {
+                await BuildAndRun_CMake(release);
+            }
+            else
+            {
+                await BuildAndRun_MsBuild(release);
+            }
+        }
+
+
+        private async Task BuildAndRun_MsBuild(bool release)
         {
             SelectedOutputTabIndex = 0;
             try
@@ -61,6 +73,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     {
                         process.StartInfo.Arguments += " " + Preferences.BuildParams;
                     }
+
+                    if (!process.StartInfo.Arguments.Contains("Configuration"))
+                    {
+                        process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
+                    }
+
                     _runningProcesses.Add(process);
                     await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
                     {
@@ -159,6 +177,78 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 executablePath = executablePath.Substring(beforeExeIndex, exeIndex - beforeExeIndex + 4);
             }
 
+        }
+
+        private bool IsCMakeProject()
+        {
+            return SelectedSolutionPath != null && SelectedSolutionPath.EndsWith("CMakeLists.txt");
+        }
+
+        private async Task GenerateCMakeProject()
+        {
+            /*set -e
+
+mkdir -p build; cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build . -j`nproc`
+cd .. && SDL_VIDEODRIVER=wayland build/game */
+           
+        }
+
+        private async Task BuildAndRun_CMake(bool release)
+        {
+            SelectedOutputTabIndex = 0;
+            try
+            {
+                if (!string.IsNullOrEmpty(SelectedSolutionPath))
+                {
+                    string? executablePath = null;
+                    Process process = new Process();
+                    process.StartInfo.FileName = Preferences.MSBuildPath;
+                    process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
+                    if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
+                    {
+                        process.StartInfo.Arguments += " " + Preferences.BuildParams;
+                    }
+
+                    if (!process.StartInfo.Arguments.Contains("Configuration"))
+                    {
+                        process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
+                    }
+
+                    _runningProcesses.Add(process);
+                    await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
+                    {
+                        if (outputLine != null && outputLine.Contains(".exe") && outputLine.Contains("->"))
+                        {
+                            executablePath = outputLine;
+                            TrimExecutablePath(ref executablePath);
+                        }
+                    });
+                    _runningProcesses.Remove(process);
+
+                    if (executablePath != null)
+                    {
+                        SelectedOutputTabIndex = 1;
+                        //Run the build
+                        Process runProcess = new Process();
+                        _runningProcesses.Add(process);
+                        runProcess.StartInfo.FileName = executablePath;
+                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(SelectedSolutionPath);
+                        await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
+                        _runningProcesses.Remove(process);
+                    }
+
+
+                }
+            }
+            catch (Exception exc)
+            {
+                SelectedOutputTabIndex = 0;
+                BuildOutput.WriteLine("===========ERROR==========");
+                BuildOutput.WriteLine("Build and Run encountered an exception: " + exc.Message);
+
+            }
         }
     }
 }

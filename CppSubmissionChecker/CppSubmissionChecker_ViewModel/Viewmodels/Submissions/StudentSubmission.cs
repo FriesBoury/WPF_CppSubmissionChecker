@@ -17,6 +17,17 @@ using System.Text.RegularExpressions;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
+    public class SubmissionCommand : ViewmodelBase
+    {
+        public string CommandText { get; private set; } = "Build and Run";
+        public RelayCommand Command { get; private set; }
+
+        public SubmissionCommand(string text, Action command, Func<bool>? condition = null)
+        {
+            CommandText = text;
+            Command = condition == null ? new RelayCommand(command) : new RelayCommand(command, condition);
+        }
+    }
 
     public abstract class StudentSubmission : ViewmodelBase
     {
@@ -36,9 +47,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
 
         //To override in inherited classes
-        public string OpenProjectCommandText { get; private set; } = "Build and Run";
-        public RelayCommand? OpenProjectCommand { get; private set; }
-
+        public ReadOnlyCollection<SubmissionCommand> SubmissionCommands => _submissionCommands.AsReadOnly();
+        protected List<SubmissionCommand> _submissionCommands = new List<SubmissionCommand>();
 
         public TextLog_VM ExecutionOutput
         {
@@ -122,7 +132,9 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         //TODO: Move extraction functionality to a separate SubmissionArchive class per type (based on file extension)
         public bool ExtractToPath(string dirPath, bool deleteExistingFiles, Action<float>? pctCallback = null)
         {
-            if (_archiveEntry == null) return false;
+            if (_archiveEntry == null)
+                return false;
+
             try
             {
                 if (deleteExistingFiles)
@@ -244,6 +256,10 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 List<string> paths = new List<string>();
                 FindFilesWithExtension(FullDirPath, ".sln", ref paths);
 
+                List<string> cmake = new List<string>();
+                //Find CMAkeLists.txt
+                FindFilesWithExtension(FullDirPath, "CMakelists.txt", ref cmake);
+
                 //Find Exe's
                 List<string> executables = new List<string>();
                 FindFilesWithExtension(FullDirPath, ".exe", ref executables);
@@ -264,7 +280,19 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                         SolutionPaths.Add(p);
                     }
 
-                    SelectedSolutionPath = SolutionPaths.FirstOrDefault();
+                    foreach (string p in cmake)
+                    {
+                        SolutionPaths.Add(p);
+                    }
+
+                    if (cmake.Any())
+                    {
+                        SelectedSolutionPath = cmake.FirstOrDefault();
+                    }
+                    else
+                    {
+                        SelectedSolutionPath = SolutionPaths.FirstOrDefault();
+                    }
                     DirectoryTree = new UserDirectory(FullDirPath);
                     MarkFilesInDirectory(DirectoryTree);
                     DirectoryTree.FileMarkedChanged += DirectoryTree_FileMarkedChanged;
@@ -291,7 +319,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     markedAny = true;
                 }
             }
-            foreach(var dir in directory.Subfolders)
+            foreach (var dir in directory.Subfolders)
             {
                 markedAny |= MarkFilesInDirectory(dir);
             }
@@ -374,7 +402,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         {
             foreach (var file in Directory.GetFiles(directory))
             {
-                if (file.EndsWith(extension))
+                if (file.EndsWith(extension, StringComparison.InvariantCultureIgnoreCase))
                 {
                     solutions.Add(file);
                 }

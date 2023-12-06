@@ -42,8 +42,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 default:
                 case CPP:
                 case CSHARPNET:
-                    return new StudentSubmission_CSharp(studentName, entry, tracker);
-
+                    StudentSubmission cSharp =  new StudentSubmission_CSharp(studentName, entry, tracker);
+                    return cSharp;
                 case UNITY:
                     return new StudentSubmission_Unity(studentName, entry, tracker);
             }
