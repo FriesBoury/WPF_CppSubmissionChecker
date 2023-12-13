@@ -114,8 +114,9 @@ namespace CppSubmissionChecker_View.UserControls
         }
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            string? path = ((sender as FrameworkElement)?.DataContext as CodeFile_VM)?.Path;
-            string? text = (sender as FrameworkElement)?.Parent.FindChild<TextEditor>()?.Text;
+            var codeFile_vm = ((sender as FrameworkElement)?.DataContext as CodeFile_VM);
+            string? path = codeFile_vm?.Path;
+            string? text = codeFile_vm?.FileContent;
 
             if (!string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(text))
             {
@@ -135,5 +136,13 @@ namespace CppSubmissionChecker_View.UserControls
         }
         #endregion
 
+        private void _fileTxt_TextChanged(object sender, EventArgs e)
+        { 
+            TextEditor? editor = sender as TextEditor;
+            if(editor == null) return;
+
+            CodeFile_VM? file_vm = _viewModel?.SelectedCodeFile as CodeFile_VM;
+            if (file_vm != null) file_vm.FileContent = editor.Text;
+        }
     }
 }

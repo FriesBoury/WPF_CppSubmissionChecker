@@ -66,7 +66,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         {
             _zipArchive = archive;
             _studentSubmissions = new List<StudentSubmission>();
-            _markedFileTracker = new MarkedFileTracker();
+            _markedFileTracker = new MarkedFileTracker(Preferences.TempFolderPath) ;
             foreach (var entry in archive.Entries)
             {
                 if (entry == null)

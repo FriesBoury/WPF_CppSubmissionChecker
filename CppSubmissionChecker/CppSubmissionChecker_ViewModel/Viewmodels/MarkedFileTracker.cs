@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,25 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels
 {
     public class MarkedFileTracker : ObservableObject
     {
-        public ObservableCollection<string> MarkedFiles { get; private set; } = new ObservableCollection<string>();
+        private readonly string _configPath;
+
+        public MarkedFileTracker(string configFolder)
+        {
+            string configPath = Path.Combine(configFolder, "markedFiles.json");
+            List<string> markedFiles = new List<string>();
+            if (File.Exists(configPath))
+            {
+                var list = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(configPath));
+                if (list != null)
+                {
+                    markedFiles = list;
+                }
+            }
+
+            MarkedFiles = new ObservableCollection<string>(markedFiles);
+            _configPath = configPath;
+        }
+        public ObservableCollection<string> MarkedFiles { get; private set; }
         public void SetFileTracking(string path, bool tracked, string rootPath)
         {
             path = FilterPath(path, rootPath);
@@ -24,6 +43,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels
             {
                 MarkedFiles.Remove(path);
             }
+            SaveConfig();
         }
 
         string FilterPath(string path, string rootPath)
@@ -46,6 +66,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels
         {
             path = FilterPath(path, rootPath);
             return MarkedFiles.Any(p => path.EndsWith(p, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        private void SaveConfig()
+        {
+            File.WriteAllText(_configPath, JsonConvert.SerializeObject(MarkedFiles.ToList()));
         }
     }
 }

@@ -35,7 +35,6 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         }
 
         private List<Process> _runningProcesses = new List<Process>();
-
         public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
         {
 
@@ -43,7 +42,6 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             _submissionCommands.Add(new SubmissionCommand("Build And Run [Release]", () => { BuildAndRun(true); }));
 
         }
-
 
         private async void BuildAndRun(bool release)
         {

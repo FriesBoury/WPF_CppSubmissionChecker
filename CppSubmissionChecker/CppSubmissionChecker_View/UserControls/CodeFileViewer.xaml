@@ -24,7 +24,7 @@
         </DataTemplate>
         <DataTemplate  DataType="{x:Type previewVM:CodeFile_VM}">
             <Grid>
-                <avalon:TextEditor DataContext="{Binding FileContent}" 
+                <avalon:TextEditor DataContext="{Binding FileContent, Mode=TwoWay}" 
                                     Background="#1e1e1e"
                                     Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
                                     ShowLineNumbers="True"
@@ -33,7 +33,7 @@
                                     FontSize="10pt" 
                                     IsReadOnly="False"
                                    Foreground="#C8C8C8"
-                                    Text="">
+                                    Text="" TextChanged="_fileTxt_TextChanged">
                 </avalon:TextEditor>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
                     <Button Click="ShowInExplorer_Click" >Show in Explorer</Button>
