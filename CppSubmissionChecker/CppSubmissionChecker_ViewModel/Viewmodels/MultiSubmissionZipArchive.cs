@@ -12,15 +12,17 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 {
     public class MultiSubmissionZipArchive : ViewmodelBase
     {
-
-        public event Action<Exception>? ExceptionFired;
+        public event Action<Exception> ExceptionFired;
+      
         //Private fields
         private const string _subDirName = "SubmissionChecker";
         private ZipArchive _zipArchive;
         private List<StudentSubmission> _studentSubmissions;
         private StudentSubmission? _selectedStudentSubmission;
         private MarkedFileTracker _markedFileTracker;
+
         //Public Properties
+        public MarkedFileTracker MarkedFileTracker => _markedFileTracker;
         public bool HasData => _studentSubmissions.Count > 0;
         public bool Loading { get; private set; }
 
@@ -55,7 +57,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             _selectedStudentSubmission = value;
             if (_selectedStudentSubmission != null)
             {
-                LoadSubmission(_selectedStudentSubmission);
+                await ExtractSubmission(_selectedStudentSubmission);
             }
             OnPropertyChanged(nameof(SelectedSubmission));
             OnPropertyChanged(nameof(HasSelectedSubmission));
@@ -90,12 +92,12 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
         {
             await submission.Unload();
         }
-        async void LoadSubmission(StudentSubmission submission)
+      
+        public async Task ExtractSubmission(StudentSubmission submission)
         {
 
             Loading = true;
             OnPropertyChanged(nameof(Loading));
-            OnPropertyChanged(nameof(HasSelectedSubmission));
 
             try
             {
@@ -116,7 +118,6 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 
             Loading = false;
             OnPropertyChanged(nameof(Loading));
-            OnPropertyChanged(nameof(HasSelectedSubmission));
         }
     }
 }

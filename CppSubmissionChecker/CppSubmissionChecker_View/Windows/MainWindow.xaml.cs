@@ -42,7 +42,7 @@ namespace CppSubmissionChecker_View
             InitializeComponent();
         }
 
-       
+
 
         private void MainWindow_Activated(object? sender, EventArgs e)
         {
@@ -184,6 +184,14 @@ namespace CppSubmissionChecker_View
             _preferencesWindow.Show();
             _preferencesWindow.Closed += PreferencesWindow_Closed;
             _preferencesWindow.Focus();
+        }
+
+        private void FraudDetection_Click(object sender, RoutedEventArgs e)
+        {
+            if (_viewModel?.SelectedArchive != null)
+            {
+                new FraudDetectionWindow(_viewModel.SelectedArchive).Show();
+            }
         }
     }
 

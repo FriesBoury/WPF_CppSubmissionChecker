@@ -34,7 +34,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
-        private List<Process> _runningProcesses = new List<Process>();
+        protected List<Process> _runningProcesses = new List<Process>();
         public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
         {
 
@@ -112,7 +112,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
-        private async Task RunAndMonitorProcess(Process process, TextLog_VM console, bool hideConsole, Action<string?>? receivedOutput)
+        protected async Task RunAndMonitorProcess(Process process, TextLog_VM console, bool hideConsole, Action<string?>? receivedOutput)
         {
             process.StartInfo.RedirectStandardError = true;
             process.StartInfo.RedirectStandardOutput = true;
@@ -190,7 +190,7 @@ mkdir -p build; cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . -j`nproc`
 cd .. && SDL_VIDEODRIVER=wayland build/game */
-           
+
         }
 
         private async Task BuildAndRun_CMake(bool release)

@@ -12,10 +12,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         private const string UNITY = "Unity";
         private const string CPP = "C++";
         private const string CSHARPNET = "C# .NET";
+        private const string GPP_EXAM = "GPP Exam";
 
         private string _selectedType;
 
-        public string[] TypeNames { get; private set; } = new string[] { CPP, CSHARPNET, UNITY };
+        public string[] TypeNames { get; private set; } = new string[] { CPP, CSHARPNET, UNITY, GPP_EXAM };
         public string SelectedType
         {
             get => _selectedType;
@@ -46,6 +47,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     return cSharp;
                 case UNITY:
                     return new StudentSubmission_Unity(studentName, entry, tracker);
+                case GPP_EXAM:
+                    return new StudentSubmission_GPPExam(studentName, entry, tracker);
             }
 
 

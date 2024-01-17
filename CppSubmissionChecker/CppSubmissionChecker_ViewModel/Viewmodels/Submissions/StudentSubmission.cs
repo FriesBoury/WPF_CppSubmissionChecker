@@ -166,12 +166,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 {
                     Directory.CreateDirectory(FullDirPath);
 
-
                     float progress = 0f;
                     pctCallback?.Invoke(progress);
                     if (_archiveEntry.Name.EndsWith(".zip"))
                     {
-                        using (ZipArchive archive = new ZipArchive(_archiveEntry.Open(), ZipArchiveMode.Read))
+                        using ( ZipArchive archive = new ZipArchive(_archiveEntry.Open(), ZipArchiveMode.Read))
                         {
                             archive.ExtractToDirectory(FullDirPath);
                             Size = archive.Entries.Sum(x => x.Length);
@@ -437,6 +436,20 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         }
 
         public abstract Task RunProcessAsync(Process process);
+
+        internal string? GetRelativeFile(string markedFilePath)
+        {
+            if (FullDirPath == null) return null;
+
+            string rootFolderPath = FullDirPath;    
+            if (!string.IsNullOrEmpty(Preferences.ProjectRootFolderName))
+            {
+                rootFolderPath = FindSubDirectory(FullDirPath, Preferences.ProjectRootFolderName) ?? rootFolderPath;
+            }
+            string path = Path.GetFullPath( Path.Combine(rootFolderPath, markedFilePath));
+            if(File.Exists(path)) { return path; }
+            return null;
+        }
     }
 }
 

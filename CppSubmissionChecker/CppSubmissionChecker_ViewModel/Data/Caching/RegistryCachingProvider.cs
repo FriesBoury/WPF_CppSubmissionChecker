@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿#pragma warning disable CA1416
+
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,7 +44,7 @@ namespace CppSubmissionChecker_ViewModel.Data.Caching
         {
             try
             {
-                _userPrefs.DeleteValue(key);
+                _userPrefs?.DeleteValue(key);
             }
             catch
             {
