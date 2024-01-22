@@ -42,7 +42,9 @@
             <DockPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" LastChildFill="true" >
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                     <Button Click="FraudDetection_Click">FD</Button>
+                    <Button Command="{Binding SelectedArchive.BatchOpenInUnityCommand}" >Batch Open in Unity</Button>
                 </StackPanel>
+                
                 <TabControl>
                     <TabItem Header="Submissions">
                         <Grid Width="200">

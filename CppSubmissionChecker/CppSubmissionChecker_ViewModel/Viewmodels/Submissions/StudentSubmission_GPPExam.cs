@@ -5,11 +5,16 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
     public class StudentSubmission_GPPExam : StudentSubmission_CSharp
     {
+        const int _offsetX = 0;
+        const int _offsetY = 0;
+        //const int _offsetX = 0;
+        //const int _offsetY = 0;
+
         static readonly string _batchRunnerContents = 
-            "start GPP_EXAM_RELEASE.exe -x 30 -y 30 -s 53       \r\n\r\n" +
-            "start GPP_EXAM_RELEASE.exe -x 1000 -y 30 -s 17     \r\n\r\n" +
-            "start GPP_EXAM_RELEASE.exe -x 30 -y 600 -s 25      \r\n\r\n" +
-            "start GPP_EXAM_RELEASE.exe -x 1000 -y 600 -s 78    \r\n" +
+            $"start GPP_EXAM_RELEASE.exe -x {30 + _offsetX} -y {30+ _offsetY} -s 53       \r\n\r\n" +
+            $"start GPP_EXAM_RELEASE.exe -x {1000 + _offsetX} -y {30 + _offsetY} -s 17     \r\n\r\n" +
+            $"start GPP_EXAM_RELEASE.exe -x {30 + _offsetX} -y {600 + _offsetY} -s 25      \r\n\r\n" +
+            $"start GPP_EXAM_RELEASE.exe -x {1000 + _offsetX} -y {600 + _offsetY} -s 78    \r\n" +
             "echo new ActiveXObject(\"WScript.Shell\").AppActivate(\"GPP_TEST_RELEASE.exe\"); > tmp.js\r\ncscript //nologo tmp.js & del tmp.js";
 
         public StudentSubmission_GPPExam(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)

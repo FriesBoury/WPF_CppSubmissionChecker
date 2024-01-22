@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,11 +13,14 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
     public class StudentSubmission_Unity : StudentSubmission
     {
+        [DllImport("user32.dll")] private static extern int GetWindowText(int hWnd, StringBuilder title, int size);
+
+
 
         private List<Process> _runningProcesses = new List<Process>();
         public StudentSubmission_Unity(string name, ZipArchiveEntry entry, MarkedFileTracker tracker) : base(name, entry, tracker)
         {
-            _submissionCommands.Add(new SubmissionCommand("Open in Unity", OpenProject));
+            _submissionCommands.Add(new SubmissionCommand("Open in Unity", () => { OpenProject(); }));
 
         }
         public StudentSubmission_Unity() : base()
@@ -24,7 +28,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
         }
 
-        public void OpenProject()
+        public async Task OpenProject(bool exitAfterStart = false)
         {
             if (FullDirPath == null) return;
 
@@ -50,6 +54,37 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             pStart.Arguments = $" -projectPath \"{projectDir}\"";
 
             Process? p = Process.Start(pStart);
+            if (exitAfterStart)
+            {
+                await Task.Run(() => MonitorProcess(p));
+                p.Kill();
+            }
+        }
+
+        void MonitorProcess(Process unityProcess)
+        {
+            while (!unityProcess.HasExited)
+            {
+                try
+                {
+                    Process other = Process.GetProcessById(unityProcess.Id);
+                    string titlestr = other.MainWindowTitle;
+
+                    if (!string.IsNullOrEmpty(titlestr))
+                    {
+                        if (!titlestr.StartsWith("Open Project")
+                            && !titlestr.StartsWith("Initializing")
+                            && !titlestr.StartsWith("Compiling"))
+                        {
+                            break;
+                        }
+                    }
+                    Thread.Sleep(3000);
+                } 
+                catch {
+                    break;
+                }
+            }
         }
 
         public override async Task Unload()

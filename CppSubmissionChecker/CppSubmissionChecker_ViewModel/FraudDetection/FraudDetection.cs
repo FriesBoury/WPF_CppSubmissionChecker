@@ -265,13 +265,13 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
                     {
                         int compare = el1.Peek().CompareTo(el2.Peek());
 
-                        if(compare >0)
+                        if (compare > 0)
                         {
                             el2.Dequeue();
-                            
+
                             ++amtMisses;
                         }
-                        else if(compare <0)
+                        else if (compare < 0)
                         {
                             el1.Dequeue();
                             ++amtMisses;
@@ -290,7 +290,7 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
                         results.Add(new FraudCase()
                         {
                             Item1 = DetectionResults[idx],
-                            Item2 = DetectionResults[idx2], 
+                            Item2 = DetectionResults[idx2],
                             MatchPct = matchPct
                         });
                     }

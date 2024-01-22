@@ -1,6 +1,8 @@
-﻿using CppSubmissionChecker_ViewModel.Data;
+﻿using CommunityToolkit.Mvvm.Input;
+using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Viewmodels;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
+using SharpCompress.Archives;
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -28,6 +30,8 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 
         public float LoadingProgress { get; private set; }
 
+        public AsyncRelayCommand BatchOpenInUnityCommand { get; private set; } 
+
         public bool HasSelectedSubmission => _selectedStudentSubmission != null && !Loading;
 
         public List<StudentSubmission> StudentSubmissions
@@ -45,6 +49,18 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             set
             {
                 SwapSubmission(value);
+            }
+        }
+
+        async Task BatchOpenInUnity()
+        {
+            foreach (var submission in StudentSubmissions)
+            {
+                if (submission is not StudentSubmission_Unity ss_unity) continue;
+
+                await ExtractSubmission(submission);
+                await ss_unity.OpenProject(true);
+
             }
         }
 
@@ -80,6 +96,8 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             }
 
             StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();
+
+            BatchOpenInUnityCommand = new AsyncRelayCommand(BatchOpenInUnity); 
         }
 
         private void SetLoadingProgress(float progress)

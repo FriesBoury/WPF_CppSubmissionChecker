@@ -297,7 +297,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     DirectoryTree.FileMarkedChanged += DirectoryTree_FileMarkedChanged;
                     FinishedLoading?.Invoke();
                     OnPropertyChanged(nameof(DirectoryTree));
-
+                    OnPropertyChanged(nameof(SolutionPaths));
                 });
 
 
