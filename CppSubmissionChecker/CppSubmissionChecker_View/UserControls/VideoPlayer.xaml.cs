@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CppSubmissionChecker_ViewModel.Viewmodels.FilePreview;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,8 @@ namespace CppSubmissionChecker_View.UserControls
     /// </summary>
     public partial class VideoPlayer : UserControl
     {
+        MediaFile_VM? _viewmodel;
+        private bool _abortTimerRequested = false;
         public VideoPlayer()
         {
             InitializeComponent();
@@ -28,39 +31,75 @@ namespace CppSubmissionChecker_View.UserControls
 
         private void VideoPlayer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-           
+            UnRegisterEvents();
+            _viewmodel = e.NewValue as MediaFile_VM;
+            RegisterEvents();
+            _viewmodel.IsPlaying = true;
         }
 
-        // Play the media.
-        void OnMouseDownPlayMedia(object sender, MouseButtonEventArgs args)
+        void RegisterEvents()
         {
-
-            // The Play method will begin the media if it is not currently active or
-            // resume media if it is paused. This has no effect if the media is
-            // already running.
-            myMediaElement.Play();
-
-            // Initialize the MediaElement property values.
-            InitializePropertyValues();
+            if (_viewmodel == null) return;
+            _viewmodel.PropertyChanged += _viewmodel_PropertyChanged;
         }
 
-        // Pause the media.
-        void OnMouseDownPauseMedia(object sender, MouseButtonEventArgs args)
+
+
+        void UnRegisterEvents()
         {
-
-            // The Pause method pauses the media if it is currently running.
-            // The Play method can be used to resume.
-            myMediaElement.Pause();
+            if (_viewmodel == null) return;
+            _viewmodel.PropertyChanged -= _viewmodel_PropertyChanged;
+            _viewmodel = null;
         }
 
-        // Stop the media.
-        void OnMouseDownStopMedia(object sender, MouseButtonEventArgs args)
+        private void _viewmodel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            if (_viewmodel == null) return;
+            if (sender != _viewmodel) return;
 
-            // The Stop method stops and resets the media to be played from
-            // the beginning.
-            myMediaElement.Stop();
+            switch (e.PropertyName)
+            {
+                case nameof(_viewmodel.IsPlaying):
+                    if (_viewmodel.IsPlaying)
+                    {
+                        myMediaElement.Play();
+                        _abortTimerRequested = false;
+                        Task.Run(UpdateTimer);
+                    }
+                    else
+                    {
+                        myMediaElement.Pause();
+                    }
+                    break;
+                case nameof(_viewmodel.CurrentMilliseconds):
+                    double diffcurrent = Math.Abs(myMediaElement.Position.TotalMilliseconds - _viewmodel.CurrentMilliseconds);
+                    if (diffcurrent > 2.0)
+                    {
+                        myMediaElement.Position = TimeSpan.FromMilliseconds(_viewmodel.CurrentMilliseconds);
+                    }
+                    break;
+
+            }
         }
+
+        async Task UpdateTimer()
+        {
+            while (_viewmodel != null && _viewmodel.IsPlaying && !_abortTimerRequested)
+            {
+                await Task.Delay(100);
+                try
+                {
+                    Dispatcher.Invoke(() => { _viewmodel.CurrentMilliseconds = (int)myMediaElement.Position.TotalMilliseconds; });
+
+                }
+                catch (Exception e)
+                {
+
+                }
+            }
+
+        }
+
 
         // Change the volume of the media.
         private void ChangeMediaVolume(object sender, RoutedPropertyChangedEventArgs<double> args)
@@ -69,16 +108,21 @@ namespace CppSubmissionChecker_View.UserControls
         }
 
         // Change the speed of the media.
-        private void ChangeMediaSpeedRatio(object sender, RoutedPropertyChangedEventArgs<double> args)
-        {
-            myMediaElement.SpeedRatio = (double)speedRatioSlider.Value;
-        }
+        //private void ChangeMediaSpeedRatio(object sender, RoutedPropertyChangedEventArgs<double> args)
+        //{
+        //    myMediaElement.SpeedRatio = (double)speedRatioSlider.Value;
+        //}
 
         // When the media opens, initialize the "Seek To" slider maximum value
         // to the total number of miliseconds in the length of the media clip.
         private void Element_MediaOpened(object sender, EventArgs e)
         {
-            timelineSlider.Maximum = myMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds;
+            if (_viewmodel != null)
+            {
+                _viewmodel.TotalMilliseconds = (int)Math.Ceiling(myMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds);
+                _viewmodel.CurrentMilliseconds = 0;
+                _viewmodel.IsPlaying = true;
+            }
         }
 
         // When the media playback is finished. Stop() the media to seek to media start.
@@ -103,7 +147,31 @@ namespace CppSubmissionChecker_View.UserControls
             // Set the media's starting Volume and SpeedRatio to the current value of the
             // their respective slider controls.
             myMediaElement.Volume = (double)volumeSlider.Value;
-            myMediaElement.SpeedRatio = (double)speedRatioSlider.Value;
+            //myMediaElement.SpeedRatio = (double)speedRatioSlider.Value;
+        }
+
+        private void timelineSlider_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            int SliderValue = (int)timelineSlider.Value;
+            if (_viewmodel != null)
+            {
+                _viewmodel.CurrentMilliseconds = SliderValue;
+                _abortTimerRequested = true;
+                myMediaElement.Pause();
+            }
+        }
+        private void timelineSlider_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_viewmodel == null) return;
+            if (_viewmodel.IsPlaying)
+            {
+                int SliderValue = (int)timelineSlider.Value;
+                _viewmodel.CurrentMilliseconds = SliderValue;
+
+                myMediaElement.Play();
+                _abortTimerRequested = false;
+                Task.Run(UpdateTimer);
+            }
         }
     }
 }

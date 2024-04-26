@@ -80,13 +80,18 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     _runningProcesses.Add(process);
                     await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
                     {
-                        if (outputLine != null && outputLine.Contains(".exe") && outputLine.Contains("->"))
+                        if (outputLine != null && (outputLine.Contains(".exe")|| outputLine.Contains(".dll")) && outputLine.Contains("->"))
                         {
                             executablePath = outputLine;
                             TrimExecutablePath(ref executablePath);
                         }
                     });
                     _runningProcesses.Remove(process);
+
+                    if (!string.IsNullOrEmpty(executablePath) && executablePath.EndsWith(".dll"))
+                    {
+                       executablePath = executablePath.Replace(".dll", ".exe");
+                    }
 
                     if (executablePath != null)
                     {
@@ -95,7 +100,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                         Process runProcess = new Process();
                         _runningProcesses.Add(process);
                         runProcess.StartInfo.FileName = executablePath;
-                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(SelectedSolutionPath);
+                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(executablePath);
                         await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
                         _runningProcesses.Remove(process);
                     }
@@ -161,13 +166,21 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
             while (_runningProcesses.Count > 0)
             {
+                for(int idx = _runningProcesses.Count-1; idx >= 0; --idx)
+                {
+                    if (_runningProcesses[idx] == null || _runningProcesses[idx].HasExited)
+                    {
+                        _runningProcesses.RemoveAt(idx);
+                    }
+                }
                 await Task.Delay(1000);
             }
         }
 
         private void TrimExecutablePath(ref string executablePath)
         {
-            int exeIndex = executablePath.IndexOf(".exe");
+            
+            int exeIndex = Math.Max( executablePath.IndexOf(".exe"), executablePath.IndexOf(".dll"));
             int beforeExeIndex = executablePath.IndexOf("->", 0, exeIndex);
             if (beforeExeIndex != -1)
             {

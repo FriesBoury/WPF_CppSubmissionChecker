@@ -33,7 +33,7 @@ namespace CppSubmissionChecker_View.UserControls
         {
             this.DataContextChanged += CodeFileViewer_DataContextChanged;
             InitializeComponent();
-           
+
         }
 
         private void CodeFileViewer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -46,7 +46,7 @@ namespace CppSubmissionChecker_View.UserControls
             _viewModel?.AddCodeFile(path);
             _emptyTabControl.Visibility = Visibility.Hidden;
         }
-       
+
         public void CloseAllFiles()
         {
             _viewModel?.Clear();
@@ -55,12 +55,12 @@ namespace CppSubmissionChecker_View.UserControls
 
         private void File_Close(object sender, RoutedEventArgs e)
         {
-            if(sender is FrameworkElement visual)
+            if (sender is FrameworkElement visual)
             {
-                if(visual.DataContext is CodeFile_VM fileVm)
+                if (visual.DataContext is FilePreviewBaseVM fileVm)
                 {
                     fileVm.Close();
-                    if(_viewModel != null && _viewModel.CodeFiles.Count == 0)
+                    if (_viewModel != null && _viewModel.CodeFiles.Count == 0)
                     {
                         _emptyTabControl.Visibility = Visibility.Visible;
                     }
@@ -137,9 +137,9 @@ namespace CppSubmissionChecker_View.UserControls
         #endregion
 
         private void _fileTxt_TextChanged(object sender, EventArgs e)
-        { 
+        {
             TextEditor? editor = sender as TextEditor;
-            if(editor == null) return;
+            if (editor == null) return;
 
             CodeFile_VM? file_vm = _viewModel?.SelectedCodeFile as CodeFile_VM;
             if (file_vm != null) file_vm.FileContent = editor.Text;

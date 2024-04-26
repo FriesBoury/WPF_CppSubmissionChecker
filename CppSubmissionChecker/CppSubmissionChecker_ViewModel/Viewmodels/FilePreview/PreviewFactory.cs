@@ -7,23 +7,56 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
 {
+
+
     public class FilePreviewFactory
     {
         private static readonly string[] _codeFileExtensions = new string[] { ".cs", ".h", ".cpp", ".json", ".txt", ".xaml", ".htm", ".url" };
         private static readonly string[] _mediaFileExtensions = new string[] { ".mp4", ".mov", ".mkv" };
+        private static readonly string[] _imageFileExtensions = new string[] { ".png", ".jpg", ".jpeg" };
+
+        private static readonly Dictionary<string, Type> _typesByExtension;
+        static FilePreviewFactory()
+        {
+            _typesByExtension = new Dictionary<string, Type>()
+            {
+                //codefiles
+                {".cs", typeof(CodeFile_VM)},
+                {".h", typeof(CodeFile_VM)},
+                {".cpp", typeof(CodeFile_VM)},
+                {".json", typeof(CodeFile_VM)},
+                {".txt", typeof(CodeFile_VM)},
+                {".htm", typeof(CodeFile_VM)},
+                {".html", typeof(CodeFile_VM)},
+                {".url", typeof(CodeFile_VM)},
+                {".xaml", typeof(CodeFile_VM)},
+                {".gitignore", typeof(CodeFile_VM)},
+
+                //mediafiles
+                {".mp4", typeof(MediaFile_VM)},
+                {".mov", typeof(MediaFile_VM)},
+                {".mkv", typeof(MediaFile_VM)},
+
+                //Imagefiles
+                { ".png", typeof(ImageFile_VM)},
+                {".jpg", typeof(ImageFile_VM)},
+                {".jpeg", typeof(ImageFile_VM)},
+            };
+        }
 
         public FilePreviewBaseVM? BuildFilePreviewVM(string filePath)
         {
-            
-            if (IsTextFile(filePath))
-            {
-                return new CodeFile_VM(filePath);
-            }
-            if (IsMediaFile(filePath))
-            {
-                return new MediaFile_VM(filePath);
-            }
-            return null;
+            if (string.IsNullOrEmpty(filePath)) return null;
+            int extIndex = filePath.LastIndexOf('.');
+            if(extIndex < 0) return null;  
+
+            string extension = filePath.Substring(extIndex);
+            Type? typeMatch = _typesByExtension!.GetValueOrDefault<string,Type?>(extension, null);
+            if (typeMatch == null) return null;
+
+            object[] constructorArgs = new[] { filePath };
+
+            return  Activator.CreateInstance(typeMatch, constructorArgs ) as FilePreviewBaseVM;
         }
 
         bool IsTextFile(string? path)
@@ -39,6 +72,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
         bool IsMediaFile(string? path)
         {
             return !string.IsNullOrEmpty(path) && _mediaFileExtensions.Any(ext => path.EndsWith(ext));
+        }
+
+        bool IsImageFile(string? path)
+        {
+            return !string.IsNullOrEmpty(path) && _imageFileExtensions.Any(ext => path.EndsWith(ext));
         }
     }
 }

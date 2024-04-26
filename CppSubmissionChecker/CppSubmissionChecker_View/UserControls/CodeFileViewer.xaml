@@ -47,6 +47,12 @@
                 
             </Grid>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type previewVM:ImageFile_VM}">
+            <Grid>
+                <Image Source="{Binding Path}"/>
+
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource _headerTemplate}">

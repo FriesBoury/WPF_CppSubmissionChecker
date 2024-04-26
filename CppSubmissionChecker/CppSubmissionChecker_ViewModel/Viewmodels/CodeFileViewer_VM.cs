@@ -40,7 +40,7 @@ namespace CppSubmissionChecker_ViewModel
 
         private void CodeFile_Closed(object? sender, EventArgs e)
         {
-            if (sender is CodeFile_VM codeFileVm)
+            if (sender is FilePreviewBaseVM codeFileVm)
             {
                 CodeFiles.Remove(codeFileVm);
                 if (codeFileVm == SelectedCodeFile)
