@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CppSubmissionChecker_View.Windows"
+        xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:uc="clr-namespace:CppSubmissionChecker_View.UserControls"
         xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel.FraudDetection;assembly=CppSubmissionChecker_ViewModel"
         mc:Ignorable="d"
@@ -29,6 +30,29 @@
             <Button Grid.Column="2" Command="{Binding StartAnalyzeCommand}">Analyze</Button>
         </Grid>
         <TabControl Grid.Row="1">
+            <TabItem Header="Files">
+                <StackPanel Orientation="Vertical">
+                    <ItemsControl Background="Black" ItemsSource="{Binding FilesToCheck}" Margin="5,5,5,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid  HorizontalAlignment="Stretch" >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Command="{Binding DeleteCommand}">
+                                        <icons:PackIconMaterial Kind="TrashCan" Height="10"></icons:PackIconMaterial>
+                                    </Button>
+                                    <TextBox Grid.Column="1" Text="{Binding FilePath}" Background="Black" Foreground="white"></TextBox>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button HorizontalAlignment="Left" Width="100" Margin="5" Command="{Binding AddFileCommand}">
+                        <icons:PackIconMaterial Kind="PlusBox"></icons:PackIconMaterial>
+                    </Button>
+                </StackPanel>
+            </TabItem>
             <TabItem Header="Console Output">
                 <uc:TextLog DataContext="{Binding Logs}"/>
             </TabItem>

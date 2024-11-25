@@ -27,6 +27,17 @@ namespace CppSubmissionChecker_View.UserControls
         {
             InitializeComponent();
             this.DataContextChanged += VideoPlayer_DataContextChanged;
+            this.IsVisibleChanged += VideoPlayer_IsVisibleChanged;
+        }
+
+        private void VideoPlayer_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (!e.NewValue.Equals(true))
+            {
+                if (_viewmodel != null) _viewmodel.IsPlaying = false;
+                this.DataContext = null;
+            }
+
         }
 
         private void VideoPlayer_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -34,7 +45,8 @@ namespace CppSubmissionChecker_View.UserControls
             UnRegisterEvents();
             _viewmodel = e.NewValue as MediaFile_VM;
             RegisterEvents();
-            _viewmodel.IsPlaying = true;
+            if (_viewmodel != null)
+                _viewmodel.IsPlaying = true;
         }
 
         void RegisterEvents()
@@ -54,6 +66,7 @@ namespace CppSubmissionChecker_View.UserControls
 
         private void _viewmodel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+
             if (_viewmodel == null) return;
             if (sender != _viewmodel) return;
 
@@ -62,18 +75,21 @@ namespace CppSubmissionChecker_View.UserControls
                 case nameof(_viewmodel.IsPlaying):
                     if (_viewmodel.IsPlaying)
                     {
+                 
                         myMediaElement.Play();
+                        myMediaElement.Position = TimeSpan.FromMilliseconds(_viewmodel.CurrentMilliseconds);
                         _abortTimerRequested = false;
                         Task.Run(UpdateTimer);
                     }
                     else
                     {
                         myMediaElement.Pause();
+                        _abortTimerRequested = true;
                     }
                     break;
                 case nameof(_viewmodel.CurrentMilliseconds):
                     double diffcurrent = Math.Abs(myMediaElement.Position.TotalMilliseconds - _viewmodel.CurrentMilliseconds);
-                    if (diffcurrent > 2.0)
+                    if (diffcurrent > 500)
                     {
                         myMediaElement.Position = TimeSpan.FromMilliseconds(_viewmodel.CurrentMilliseconds);
                     }
@@ -89,7 +105,14 @@ namespace CppSubmissionChecker_View.UserControls
                 await Task.Delay(100);
                 try
                 {
-                    Dispatcher.Invoke(() => { _viewmodel.CurrentMilliseconds = (int)myMediaElement.Position.TotalMilliseconds; });
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (_viewmodel != null)
+                        {
+                            _viewmodel.CurrentMilliseconds = (int)myMediaElement.Position.TotalMilliseconds;
+
+                        }
+                    });
 
                 }
                 catch (Exception e)
@@ -119,7 +142,15 @@ namespace CppSubmissionChecker_View.UserControls
         {
             if (_viewmodel != null)
             {
-                _viewmodel.TotalMilliseconds = (int)Math.Ceiling(myMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds);
+                if (myMediaElement.NaturalDuration.HasTimeSpan)
+                {
+                    _viewmodel.TotalMilliseconds = (int)Math.Ceiling(myMediaElement.NaturalDuration.TimeSpan.TotalMilliseconds);
+                }
+                else
+                {
+                    _viewmodel.TotalMilliseconds = 300000;
+                }
+            
                 _viewmodel.CurrentMilliseconds = 0;
                 _viewmodel.IsPlaying = true;
             }

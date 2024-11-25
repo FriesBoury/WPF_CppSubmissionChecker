@@ -35,7 +35,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         }
 
         protected List<Process> _runningProcesses = new List<Process>();
-        public StudentSubmission_CSharp(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
+        public StudentSubmission_CSharp(string longName, string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(longName, studentName, archiveEntry, tracker)
         {
 
             _submissionCommands.Add(new SubmissionCommand("Build And Run [Debug]", () => { BuildAndRun(false); }));
@@ -193,6 +193,21 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         private bool IsCMakeProject()
         {
             return SelectedSolutionPath != null && SelectedSolutionPath.EndsWith("CMakeLists.txt");
+        }
+
+        protected override async Task OpenInVS()
+        {
+            if (!IsCMakeProject())
+            {
+                await base.OpenInVS();
+            }
+            if (!string.IsNullOrEmpty(SelectedSolutionPath))
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = Preferences.VisualStudioPath;
+                process.StartInfo.Arguments = $"\"{Path.GetDirectoryName(SelectedSolutionPath)}\"";
+                await RunProcessAsync(process);
+            }
         }
 
         private async Task GenerateCMakeProject()

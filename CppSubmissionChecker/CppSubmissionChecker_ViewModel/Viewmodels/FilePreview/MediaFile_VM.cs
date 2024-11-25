@@ -17,6 +17,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
         {
             get => _isPlaying; set
             {
+                if(_isPlaying == value) return;
                 _isPlaying = value;
                 OnPropertyChanged(nameof(IsPlaying));
             }
@@ -39,6 +40,8 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
             set
             {
                 _currentMs = value;
+
+                Console.WriteLine("MediaFile: Setting currentMS to " + value);
                 CurrentTimeStr = new TimeSpan(0, 0,0, 0, _currentMs).ToString("hh\\:mm\\:ss");
                 OnPropertyChanged(nameof(CurrentMilliseconds));
             }

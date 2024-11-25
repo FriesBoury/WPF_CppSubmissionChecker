@@ -112,21 +112,6 @@ namespace CppSubmissionChecker_View.UserControls
             _codeViewer.OpenFile(path);
         }
 
-        //TODO: Move to VM
-
-        private async void OpenInVS_Click(object sender, RoutedEventArgs e)
-        {
-            if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = Preferences.VisualStudioPath;
-                process.StartInfo.Arguments = $"\"{_submissionViewModel.SelectedSolutionPath}\"";
-                await _submissionViewModel?.RunProcessAsync(process);
-
-
-            }
-        }
-
         private void FindInExplorer_Click(object sender, RoutedEventArgs e)
         {
             if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
@@ -138,9 +123,19 @@ namespace CppSubmissionChecker_View.UserControls
             }
         }
 
-        private void _directoryTree_SelectedItemChanged_1(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if ((sender as FrameworkElement)?.DataContext is UserFile userFile)
+            {
+                if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
+                {
 
+                    Process process = new Process();
+                    process.StartInfo.FileName = "explorer";
+                    process.StartInfo.Arguments = "/select,  " + $"\"{userFile.FilePath}\"";
+                    process.Start();
+                }
+            }
         }
     }
 }

@@ -35,8 +35,7 @@
                                    Foreground="#C8C8C8"
                                     Text="" TextChanged="_fileTxt_TextChanged">
                 </avalon:TextEditor>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Click="ShowInExplorer_Click" >Show in Explorer</Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,0,0">
                     <Button Click="Save_Click" >Save</Button>
                 </StackPanel>
             </Grid>
@@ -44,7 +43,7 @@
         <DataTemplate DataType="{x:Type previewVM:MediaFile_VM}">
             <Grid>
                 <local:VideoPlayer DataContext="{Binding}"/>
-                
+
             </Grid>
         </DataTemplate>
         <DataTemplate DataType="{x:Type previewVM:ImageFile_VM}">
@@ -53,12 +52,59 @@
 
             </Grid>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type previewVM:UnhandledFilePreview_VM}">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Foreground="White" Text="Unable to open file"></TextBlock>
+                <TextBlock Foreground="White" FontStyle="Italic" Text="{Binding Path}"/>
+                <TextBlock Foreground="Gray" Text="{Binding ExceptionMessage}"/>
+                <Button Command="{Binding ShowInExplorerCommand}">Show in Explorer</Button>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type previewVM:ExcelFile_VM}">
+            <DataGrid CanUserReorderColumns="False" CanUserResizeRows="False" CanUserSortColumns="False" HorizontalAlignment="Left" VerticalAlignment="Top" ItemsSource="{Binding DataTable}" BorderBrush="{StaticResource PrimaryColorBrush}" Background="Transparent" Foreground="{StaticResource CustomLightGrey}" IsManipulationEnabled="False" >
+                <DataGrid.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Background="Orange"></TextBlock>
+                    </DataTemplate>
+                </DataGrid.ItemTemplate>
+                <DataGrid.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource CustomWhite}"></Setter>
+                                <Setter Property="BorderBrush" Value="{StaticResource PrimaryColorBrush}"></Setter>
+                                <Setter Property="Background" Value="{StaticResource PrimaryColorBrush}"></Setter>
+
+                            </Trigger>
+                        </Style.Triggers>
+                        <Setter Property="Background" Value="Black"></Setter>
+                        <Setter Property="BorderBrush" Value="{StaticResource CustomLightGrey}"></Setter>
+                        <Setter Property="Margin" Value="0"/>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}">
+                        <Setter Property="Background" Value="{StaticResource PrimaryColorBrush}"></Setter>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <DataGrid.RowHeaderStyle>
+                    <Style TargetType="{x:Type DataGridRowHeader}">
+                        <Setter Property="Background" Value="Black"></Setter>
+                    </Style>
+                </DataGrid.RowHeaderStyle>
+            </DataGrid >
+        </DataTemplate>
+
     </UserControl.Resources>
     <Grid>
         <TabControl DockPanel.Dock="Left" Name ="_fileTabControl" SelectedItem="{Binding SelectedCodeFile}" ItemsSource="{Binding CodeFiles}" ItemTemplate="{StaticResource _headerTemplate}">
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <UserControl Content="{Binding}"/>
+                    <Grid>
+                        <UserControl Content="{Binding}"/>
+                        <Button Command="{Binding ShowInExplorerCommand}" HorizontalAlignment="Right" VerticalAlignment="Top">Show in explorer</Button>
+                    </Grid>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>

@@ -17,7 +17,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             $"start GPP_EXAM_RELEASE.exe -x {1000 + _offsetX} -y {600 + _offsetY} -s 78    \r\n" +
             "echo new ActiveXObject(\"WScript.Shell\").AppActivate(\"GPP_TEST_RELEASE.exe\"); > tmp.js\r\ncscript //nologo tmp.js & del tmp.js";
 
-        public StudentSubmission_GPPExam(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(studentName, archiveEntry, tracker)
+        public StudentSubmission_GPPExam(string longName, string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(longName, studentName, archiveEntry, tracker)
         {
             _submissionCommands.Clear();
             _submissionCommands.Add(new SubmissionCommand("Run 4 windows", Run4Windows));

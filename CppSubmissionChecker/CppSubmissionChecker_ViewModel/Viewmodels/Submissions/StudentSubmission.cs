@@ -17,6 +17,43 @@ using System.Text.RegularExpressions;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
+
+    public class SomeClass
+    {
+        //top of the FixedUpdate function
+        //velocity = (currentPos - prevPos)/Time.deltaTime
+
+
+
+
+
+        public enum CameraState
+        {
+            Normal,
+            ZoomedIn,
+            ZoomingIn,
+            ZoomingOut
+
+        }
+
+        private CameraState _camState = CameraState.Normal;
+
+        public void Update()
+        {
+            if (_camState == CameraState.Normal)
+            {
+                //moving logic
+
+                //check for attack
+
+            }
+
+
+        }
+
+
+    }
+
     public class SubmissionCommand : ViewmodelBase
     {
         public string CommandText { get; private set; } = "Build and Run";
@@ -31,6 +68,9 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
     public abstract class StudentSubmission : ViewmodelBase
     {
+
+        public List<string> TestTabData { get; set; } = new List<string>() { "Tab01", "Tab02", "Tab03" };
+
         public event Action<string, bool> FileMarkedChanged;
         public event Action<StudentSubmission>? UnloadRequested;
         public event Action? FinishedLoading;
@@ -43,9 +83,22 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         public long Size { get; private set; }
         public UserDirectory? DirectoryTree { get; private set; }
         public ObservableCollection<string> SolutionPaths { get; private set; } = new ObservableCollection<string>();
+
+        //Executables
         public ObservableCollection<Executable> Executables { get; private set; } = new ObservableCollection<Executable>();
+        public RelayCommand ClearArgsCommand { get; private set; }
+        public string ExecutableArgs
+        {
+            get => _executableArgs; set
+            {
+                _executableArgs = value;
+                Preferences.SetValue(nameof(ExecutableArgs), value);
+                OnPropertyChanged(nameof(ExecutableArgs));
+            }
+        }
 
 
+        public AsyncRelayCommand OpenInVSCommand { get; private set; }
         //To override in inherited classes
         public ReadOnlyCollection<SubmissionCommand> SubmissionCommands => _submissionCommands.AsReadOnly();
         protected List<SubmissionCommand> _submissionCommands = new List<SubmissionCommand>();
@@ -81,6 +134,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         private readonly MarkedFileTracker _tracker;
         private string? _selectedSolutionPath;
         private bool _isUnloading;
+        private string _executableArgs;
 
         // Constructors
 
@@ -97,21 +151,27 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             FullDirPath = "SomeDir";
             StudentName = Name.Substring(0, Name.IndexOf('_', 2));
         }
-        public StudentSubmission(string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker)
+        public StudentSubmission(string longName, string shortName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker)
         {
             _archiveEntry = archiveEntry;
             _tracker = tracker;
-            Name = studentName;
-            int separatorIndex = Name.IndexOf('_');
-            if (separatorIndex == -1)
-            {
-                StudentName = Name;
-            }
-            else
-            {
-                StudentName = Name.Substring(0, separatorIndex);
-            }
+            Name = longName;
+            StudentName = shortName;
 
+            OpenInVSCommand = new AsyncRelayCommand(OpenInVS);
+            ClearArgsCommand = new RelayCommand(() => { ExecutableArgs = string.Empty; });
+            ExecutableArgs = Preferences.GetValue(nameof(ExecutableArgs));
+        }
+
+        protected virtual async Task OpenInVS()
+        {
+            if (!string.IsNullOrEmpty(SelectedSolutionPath))
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = Preferences.VisualStudioPath;
+                process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
+                await RunProcessAsync(process);
+            }
         }
 
         public virtual Task KillRunningProcesses()
@@ -153,12 +213,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
                 string archiveName = _archiveEntry.Name;
                 archiveName = Path.GetFileNameWithoutExtension(archiveName);
-                if (archiveName.Count(c => c == '_') > 1) //truncate to 2nd _
-                {
-                    int firstIdx = archiveName.IndexOf('_');
-                    string shortName = archiveName.Substring(0, archiveName.IndexOf('_', firstIdx + 1));
-                    archiveName = shortName;
-                }
+                archiveName = TruncateArchiveName(archiveName);
 
                 FullDirPath = Path.GetFullPath(Path.Combine(dirPath, archiveName));
                 FullDirPath = Regex.Replace(FullDirPath, @"[^0-9a-zA-Z\._\\/:]", "");
@@ -170,7 +225,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                     pctCallback?.Invoke(progress);
                     if (_archiveEntry.Name.EndsWith(".zip"))
                     {
-                        using ( ZipArchive archive = new ZipArchive(_archiveEntry.Open(), ZipArchiveMode.Read))
+                        using (ZipArchive archive = new ZipArchive(_archiveEntry.Open(), ZipArchiveMode.Read))
                         {
                             archive.ExtractToDirectory(FullDirPath);
                             Size = archive.Entries.Sum(x => x.Length);
@@ -345,6 +400,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 return;
 
             ProcessStartInfo p = new ProcessStartInfo(exe.FullPath);
+
+            if (!string.IsNullOrWhiteSpace(ExecutableArgs))
+            {
+                p.Arguments = ExecutableArgs;
+            }
+
             p.RedirectStandardError = true;
             p.RedirectStandardOutput = true;
             p.UseShellExecute = false;
@@ -437,17 +498,56 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
         public abstract Task RunProcessAsync(Process process);
 
+        //Archive names are in the format "studentname_(LATE)_<studentNr>_<submissionNr>_filename"
+        //To have an unique folder per student, we take studentname_<submissionNr>
+        private static string TruncateArchiveName(string archiveName)
+        {
+            int firstUnderscoreIdx = archiveName.IndexOf('_');
+            string studentName = archiveName.Substring(0,firstUnderscoreIdx);
+
+            //find submissionNr
+            string submissionNr = string.Empty;
+            int nextUnderscoreIdx = firstUnderscoreIdx;
+            bool foundFirstNr = false;
+            do
+            {
+                int startIdx = nextUnderscoreIdx + 1;
+                nextUnderscoreIdx = archiveName.IndexOf("_", startIdx);
+                string nextPart = archiveName.Substring(startIdx, nextUnderscoreIdx - startIdx);
+
+                if (foundFirstNr)
+                {
+                    submissionNr = nextPart;
+
+                }
+                else if (nextPart != "LATE")
+                {
+                    foundFirstNr = true;
+                }
+
+
+            }
+            while (string.IsNullOrEmpty(submissionNr));
+
+            return $"{studentName}_{submissionNr}";
+
+        }
         internal string? GetRelativeFile(string markedFilePath)
         {
             if (FullDirPath == null) return null;
 
-            string rootFolderPath = FullDirPath;    
+            if (markedFilePath.StartsWith("*"))
+            {
+                return Directory.GetFiles(FullDirPath, markedFilePath, searchOption: SearchOption.AllDirectories).FirstOrDefault();
+            }
+
+            string rootFolderPath = FullDirPath;
             if (!string.IsNullOrEmpty(Preferences.ProjectRootFolderName))
             {
                 rootFolderPath = FindSubDirectory(FullDirPath, Preferences.ProjectRootFolderName) ?? rootFolderPath;
             }
-            string path = Path.GetFullPath( Path.Combine(rootFolderPath, markedFilePath));
-            if(File.Exists(path)) { return path; }
+            string path = Path.GetFullPath(Path.Combine(rootFolderPath, markedFilePath));
+            if (File.Exists(path)) { return path; }
             return null;
         }
     }

@@ -56,7 +56,7 @@
                                
                             </ItemsControl>
                            
-                            <Button HorizontalAlignment="Left" Click="OpenInVS_Click">
+                            <Button HorizontalAlignment="Left" Command="{Binding OpenInVSCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <icons:PackIconMaterial Kind="MicrosoftVisualStudio"  VerticalAlignment="Stretch" Foreground="Purple"></icons:PackIconMaterial>
                                     <Label>Open in Microsoft Visual Studio</Label>
@@ -78,6 +78,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <ItemsControl ItemsSource="{Binding Executables}" >
@@ -90,7 +91,10 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <TabControl  VerticalAlignment="Stretch" Grid.Row="1">
+                        <Label Grid.Row="1">Run with Args:</Label>
+                        <TextBox Style="{StaticResource TextboxStyle}" TextWrapping="NoWrap"  Grid.Row="1" Text="{Binding ExecutableArgs}" Margin="100,0,30,0"></TextBox>
+                        <Button Grid.Row="1" HorizontalAlignment="Right" Command="{Binding ClearArgsCommand}">Clear</Button>
+                        <TabControl  VerticalAlignment="Stretch" Grid.Row="2">
                             <TabItem Header="Execution output">
                                 <local:TextLog DataContext="{Binding ExecutionOutput}"></local:TextLog>
                             </TabItem>
@@ -134,7 +138,7 @@
                                         </Grid.ColumnDefinitions>
                                         <CheckBox VerticalAlignment="Center" ToolTip="Keep open"  Background="{StaticResource BackgroundBrush}" IsChecked="{Binding IsMarked}" Foreground="Black"></CheckBox>
                                         <icons:PackIconMaterial Grid.Column="1" VerticalAlignment="Center"  Kind="FileOutline" Foreground="{StaticResource PrimaryColorBrush}"/>
-                                        <Label Grid.Column="2" Content="{Binding Name}" />
+                                        <Label Grid.Column="2" Content="{Binding Name}" MouseDoubleClick="Label_MouseDoubleClick" />
                                     </Grid>
 
                                 </DataTemplate>

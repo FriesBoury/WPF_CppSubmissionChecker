@@ -30,7 +30,11 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
                 {".html", typeof(CodeFile_VM)},
                 {".url", typeof(CodeFile_VM)},
                 {".xaml", typeof(CodeFile_VM)},
+                {".axaml", typeof(CodeFile_VM)},
                 {".gitignore", typeof(CodeFile_VM)},
+                {".md", typeof(CodeFile_VM)},
+                {".prefab", typeof(CodeFile_VM)},
+                {".meta", typeof(CodeFile_VM)},
 
                 //mediafiles
                 {".mp4", typeof(MediaFile_VM)},
@@ -41,6 +45,9 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
                 { ".png", typeof(ImageFile_VM)},
                 {".jpg", typeof(ImageFile_VM)},
                 {".jpeg", typeof(ImageFile_VM)},
+
+                //Excel files
+                {".xlsx", typeof(ExcelFile_VM) },
             };
         }
 
@@ -48,15 +55,21 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
         {
             if (string.IsNullOrEmpty(filePath)) return null;
             int extIndex = filePath.LastIndexOf('.');
-            if(extIndex < 0) return null;  
+            if (extIndex < 0) return null;
 
             string extension = filePath.Substring(extIndex);
-            Type? typeMatch = _typesByExtension!.GetValueOrDefault<string,Type?>(extension, null);
-            if (typeMatch == null) return null;
+            Type? typeMatch = _typesByExtension!.GetValueOrDefault<string, Type?>(extension, null);
+            if (typeMatch == null) return new UnhandledFilePreview_VM(filePath, "File type is not handled");
 
             object[] constructorArgs = new[] { filePath };
-
-            return  Activator.CreateInstance(typeMatch, constructorArgs ) as FilePreviewBaseVM;
+            try
+            {
+                return Activator.CreateInstance(typeMatch, constructorArgs) as FilePreviewBaseVM;
+            }
+            catch (Exception e)
+            {
+                return new UnhandledFilePreview_VM(filePath, e.Message);
+            }
         }
 
         bool IsTextFile(string? path)

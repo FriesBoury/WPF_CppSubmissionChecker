@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace CppSubmissionChecker_ViewModel.DataClasses
 {
@@ -85,14 +86,36 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
             _zipArchive = archive;
             _studentSubmissions = new List<StudentSubmission>();
             _markedFileTracker = new MarkedFileTracker(Preferences.TempFolderPath) ;
+            List<string> usedNames = new List<string>();
             foreach (var entry in archive.Entries)
             {
                 if (entry == null)
                 {
                     continue;
                 }
-                string name = entry.Name;
-                StudentSubmissions.Add(submissionFactory.CreateSubmission(name, entry, _markedFileTracker));
+                string longName = entry.Name;
+
+                string shortName = entry.Name;
+                int separatorIndex = shortName.IndexOf('_');
+                if (separatorIndex != -1)
+        
+                {
+                    shortName = shortName.Substring(0, separatorIndex);
+                }
+
+                if (usedNames.Contains(shortName))
+                {
+                    if(int.TryParse(shortName.Substring(shortName.Length - 1,1), out int result))
+                    {
+                        shortName = shortName.Substring(0, shortName.Length - 1) + (result+1).ToString();
+                    }
+                    else
+                    {
+                        shortName += "_1";
+                    }
+                }
+                usedNames.Add(shortName);
+                StudentSubmissions.Add(submissionFactory.CreateSubmission(longName, shortName, entry, _markedFileTracker));
             }
 
             StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();

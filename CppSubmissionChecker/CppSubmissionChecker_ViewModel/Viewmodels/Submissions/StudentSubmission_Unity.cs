@@ -18,35 +18,37 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
 
         private List<Process> _runningProcesses = new List<Process>();
-        public StudentSubmission_Unity(string name, ZipArchiveEntry entry, MarkedFileTracker tracker) : base(name, entry, tracker)
+        public StudentSubmission_Unity(string name, string shortname, ZipArchiveEntry entry, MarkedFileTracker tracker) : base(name, shortname, entry, tracker)
         {
             _submissionCommands.Add(new SubmissionCommand("Open in Unity", () => { OpenProject(); }));
-
+            this.FinishedLoading += StudentSubmission_Unity_FinishedLoading;
         }
         public StudentSubmission_Unity() : base()
         {
+            this.FinishedLoading += StudentSubmission_Unity_FinishedLoading;
+        }
 
+        private void StudentSubmission_Unity_FinishedLoading()
+        {
+            //remove cmake solutions
+            var cmakeSolutions = SolutionPaths.Where(s => s.EndsWith("CMakeLists.txt")).ToList();
+            foreach (var s in cmakeSolutions)
+            {
+                SolutionPaths.Remove(s);
+            }
         }
 
         public async Task OpenProject(bool exitAfterStart = false)
         {
             if (FullDirPath == null) return;
 
-            string projectDir = string.Empty;
-            if (SolutionPaths.Any())
+           
+            var projectDir = FindSubDirectory(FullDirPath, "Assets");
+            if (string.IsNullOrEmpty(projectDir))
             {
-                projectDir = SolutionPaths.First();
+                return;
             }
-            else
-            {
-                var assetsDir = FindSubDirectory(FullDirPath, "Assets");
-                if (string.IsNullOrEmpty(assetsDir))
-                {
-                    return;
-                }
-                projectDir = assetsDir;
-
-            }
+ 
 
             projectDir = projectDir.Substring(0, projectDir.LastIndexOf("\\"));
             var pStart = new ProcessStartInfo(Preferences.UnityInstallation);
@@ -69,19 +71,18 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 {
                     Process other = Process.GetProcessById(unityProcess.Id);
                     string titlestr = other.MainWindowTitle;
-
+                    string[] loadingTitles = new string[] { "Loading", "Initializing", "Compiling", "Unity Package Manager", "Open" };
                     if (!string.IsNullOrEmpty(titlestr))
                     {
-                        if (!titlestr.StartsWith("Open Project")
-                            && !titlestr.StartsWith("Initializing")
-                            && !titlestr.StartsWith("Compiling"))
+                        if (!loadingTitles.Any(lt => titlestr.StartsWith(lt)))
                         {
                             break;
                         }
                     }
                     Thread.Sleep(3000);
-                } 
-                catch {
+                }
+                catch
+                {
                     break;
                 }
             }

@@ -10,7 +10,7 @@ namespace CppSubmissionChecker_ViewModel
         private static FilePreviewFactory _previewFactory = new FilePreviewFactory();
         public void AddCodeFile(string? path)
         {
-            if(string.IsNullOrEmpty(path)) return;
+            if (string.IsNullOrEmpty(path)) return;
 
             FilePreviewBaseVM? existing = CodeFiles.FirstOrDefault(x => x.Path == path);
             if (existing == null)
@@ -28,6 +28,7 @@ namespace CppSubmissionChecker_ViewModel
                 SelectedCodeFile = existing;
                 OnPropertyChanged(nameof(SelectedCodeFile));
             }
+       
         }
 
         public void Clear()

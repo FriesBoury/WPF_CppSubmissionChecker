@@ -12,11 +12,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         private const string UNITY = "Unity";
         private const string CPP = "C++";
         private const string CSHARPNET = "C# .NET";
-        private const string GPP_EXAM = "GPP Exam";
+        private const string GPP_EXAM = "GameplayProgramming Exam"; 
+        private const string OTHER = "Other";
 
         private string _selectedType;
 
-        public string[] TypeNames { get; private set; } = new string[] { CPP, CSHARPNET, UNITY, GPP_EXAM };
+        public string[] TypeNames { get; private set; } = new string[] { OTHER, CPP, CSHARPNET, UNITY, GPP_EXAM };
         public string SelectedType
         {
             get => _selectedType;
@@ -36,19 +37,20 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             }
         }
 
-        public StudentSubmission CreateSubmission(string studentName, ZipArchiveEntry entry, MarkedFileTracker tracker)
+        public StudentSubmission CreateSubmission(string longName, string studentName, ZipArchiveEntry entry, MarkedFileTracker tracker)
         {
             switch (SelectedType)
             {
                 default:
+                    return new StudentSubmission_Default(longName, studentName, entry, tracker);
                 case CPP:
                 case CSHARPNET:
-                    StudentSubmission cSharp =  new StudentSubmission_CSharp(studentName, entry, tracker);
+                    StudentSubmission cSharp =  new StudentSubmission_CSharp(longName, studentName, entry, tracker);
                     return cSharp;
                 case UNITY:
-                    return new StudentSubmission_Unity(studentName, entry, tracker);
+                    return new StudentSubmission_Unity(longName, studentName, entry, tracker);
                 case GPP_EXAM:
-                    return new StudentSubmission_GPPExam(studentName, entry, tracker);
+                    return new StudentSubmission_GPPExam(longName, studentName, entry, tracker);
             }
 
 

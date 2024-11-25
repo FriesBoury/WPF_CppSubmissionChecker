@@ -126,13 +126,7 @@ namespace CppSubmissionChecker_View.UserControls
 
         private void ShowInExplorer_Click(object sender, RoutedEventArgs e)
         {
-            string? path = ((sender as FrameworkElement)?.DataContext as CodeFile_VM)?.Path;
-            if (string.IsNullOrEmpty(path))
-                return;
-            Process process = new Process();
-            process.StartInfo.FileName = "explorer";
-            process.StartInfo.Arguments = "/select,  " + $"\"{path}\"";
-            process.Start();
+           
         }
         #endregion
 
