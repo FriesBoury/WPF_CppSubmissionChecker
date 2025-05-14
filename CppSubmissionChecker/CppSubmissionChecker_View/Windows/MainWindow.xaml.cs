@@ -171,14 +171,23 @@ namespace CppSubmissionChecker_View
         {
             if (_studentList.DataContext is MultiSubmissionZipArchive ziparch)
             {
+				ziparch.BatchOperationStarted += Ziparch_BatchOperationStarted;
                 _studentListView = (CollectionView)CollectionViewSource.GetDefaultView(ziparch.StudentSubmissions);
                 _studentListView.Filter = new Predicate<object>(FilterSubmissionsByName);
                 _studentListView.Refresh();
+
             }
 
         }
 
-        private void ShowPreferences_Click(object sender, RoutedEventArgs e)
+		private void Ziparch_BatchOperationStarted(BatchOperationStats obj)
+		{
+            BatchOperationWindow window = new BatchOperationWindow();
+            window.DataContext = obj;
+            window.Show();
+		}
+
+		private void ShowPreferences_Click(object sender, RoutedEventArgs e)
         {
             _preferencesWindow = new PreferencesWindow();
             _preferencesWindow.Show();

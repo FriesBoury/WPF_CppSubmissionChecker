@@ -17,43 +17,6 @@ using System.Text.RegularExpressions;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
-
-    public class SomeClass
-    {
-        //top of the FixedUpdate function
-        //velocity = (currentPos - prevPos)/Time.deltaTime
-
-
-
-
-
-        public enum CameraState
-        {
-            Normal,
-            ZoomedIn,
-            ZoomingIn,
-            ZoomingOut
-
-        }
-
-        private CameraState _camState = CameraState.Normal;
-
-        public void Update()
-        {
-            if (_camState == CameraState.Normal)
-            {
-                //moving logic
-
-                //check for attack
-
-            }
-
-
-        }
-
-
-    }
-
     public class SubmissionCommand : ViewmodelBase
     {
         public string CommandText { get; private set; } = "Build and Run";

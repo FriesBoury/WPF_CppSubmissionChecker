@@ -24,11 +24,11 @@
         </DataTemplate>
         <DataTemplate  DataType="{x:Type previewVM:CodeFile_VM}">
             <Grid>
-                <avalon:TextEditor DataContext="{Binding FileContent, Mode=TwoWay}" 
+                <avalon:TextEditor 
                                     Background="#1e1e1e"
                                     Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
                                     ShowLineNumbers="True"
-                                    SyntaxHighlighting="{Binding SyntaxHighlighting}"
+                      
                                     FontFamily="Consolas"
                                     FontSize="10pt" 
                                     IsReadOnly="False"

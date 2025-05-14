@@ -15,10 +15,14 @@
     <None Remove="Resources\images\play.png" />
     <None Remove="Resources\images\stop.png" />
     <None Remove="Resources\images\tooltip_submissionszip.png" />
+    <None Remove="Resources\JSON_Dark.xml" />
+    <None Remove="Resources\XML_Dark.xml" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\CSharp_Dark.xml" />
+    <EmbeddedResource Include="Resources\JSON_Dark.xml" />
+    <EmbeddedResource Include="Resources\XML_Dark.xml" />
     <Resource Include="Resources\images\pause.png" />
     <Resource Include="Resources\images\play.png" />
     <Resource Include="Resources\images\stop.png" />

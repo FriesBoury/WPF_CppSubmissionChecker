@@ -1,0 +1,23 @@
+﻿<Window x:Class="CppSubmissionChecker_View.Windows.BatchOperationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CppSubmissionChecker_View.Windows"
+        xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel.DataClasses;assembly=CppSubmissionChecker_ViewModel"
+        mc:Ignorable="d"
+        Title="Progress"  MinHeight="80" Height="100" ResizeMode="NoResize" Width="500" Background="{StaticResource BackgroundBrush}">
+    <Window.DataContext>
+        <vm:BatchOperationStats/>
+    </Window.DataContext>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Label Content="{Binding Message}"/>
+        <ProgressBar Grid.Row="1" Minimum="0" Maximum="1" Value="{Binding Progress, Mode=OneWay}"/> 
+
+    </Grid>
+    
+</Window>

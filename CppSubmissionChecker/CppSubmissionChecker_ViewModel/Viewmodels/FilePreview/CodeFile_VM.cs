@@ -19,9 +19,11 @@
                 {
                     default:
                     case "cs":
-                        return "C++";
+                        return "c#";
                     case "xaml":
-                        return "XML";
+                        return "xml";
+                    case "json":
+                        return "json";
                 }
             }
         }

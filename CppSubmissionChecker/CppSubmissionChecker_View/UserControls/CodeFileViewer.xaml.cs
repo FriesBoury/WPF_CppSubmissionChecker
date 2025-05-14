@@ -69,22 +69,27 @@ namespace CppSubmissionChecker_View.UserControls
         }
 
         #region CodeFile
-        private static IHighlightingDefinition? _syntaxHighlighting = null;
 
-        private void LoadAvalonEditSyntaxHighlighting()
+        private IHighlightingDefinition? LoadAvalonEditSyntaxHighlighting(string language)
         {
             //if (_syntaxHighlighting != null) return;
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var resourceName = $"CppSubmissionChecker_View.Resources.CSharp_Dark.xml";
 
+            var resourceName = language switch 
+            {
+				"xml" => $"CppSubmissionChecker_View.Resources.XML_Dark.xml",
+				"json" => $"CppSubmissionChecker_View.Resources.JSON_Dark.xml",
+				"c#" => $"CppSubmissionChecker_View.Resources.CSharp_Dark.xml",
+                _=> $"CppSubmissionChecker_View.Resources.CSharp_Dark.xml"
+			};
             using (Stream? s = assembly.GetManifestResourceStream(resourceName))
             {
                 if (s == null)
-                    return;
+                    return null;
 
                 using (XmlReader reader = XmlReader.Create(s, new XmlReaderSettings { }))
                 {
-                    _syntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader, ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance);
+                    return ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader, HighlightingManager.Instance);
 
                 }
             }
@@ -92,23 +97,22 @@ namespace CppSubmissionChecker_View.UserControls
         }
         private void _fileTxt_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            LoadAvalonEditSyntaxHighlighting();
-            if (e.NewValue is string fileContent && sender is TextEditor txtEditor)
-            {
-                txtEditor.Text = fileContent;
-                txtEditor.SyntaxHighlighting = _syntaxHighlighting;
-            }
-        }
+			if (sender is TextEditor txtEditor && txtEditor.DataContext is CodeFile_VM vm)
+			{
+				txtEditor.Text = vm.FileContent;
+				txtEditor.SyntaxHighlighting = LoadAvalonEditSyntaxHighlighting(vm.SyntaxHighlighting);
+				txtEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Colors.White);
+			}
+		}
 
         private void _fileTxt_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadAvalonEditSyntaxHighlighting();
 
-            if (sender is TextEditor txtEditor && txtEditor.DataContext is string fileContent)
+            if (sender is TextEditor txtEditor && txtEditor.DataContext is CodeFile_VM vm)
             {
-                txtEditor.Text = fileContent;
-                txtEditor.SyntaxHighlighting = _syntaxHighlighting;
-                txtEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Colors.White);
+                txtEditor.Text = vm.FileContent;
+                txtEditor.SyntaxHighlighting = LoadAvalonEditSyntaxHighlighting(vm.SyntaxHighlighting);
+				txtEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Colors.White);
             }
 
         }
