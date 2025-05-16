@@ -62,8 +62,13 @@ namespace CppSubmissionChecker_ViewModel
             get => _cachingProvider.GetStringAsync(nameof(UnityInstallation)).GetAwaiter().GetResult() ?? string.Empty;
             set => _cachingProvider.SetStringAsync(nameof(UnityInstallation), value);
         }
+		public static string DeepSeekAPIKey
+        {
+            get => _cachingProvider.GetStringAsync(nameof(DeepSeekAPIKey)).Result ?? string.Empty;
+            set => _cachingProvider.SetStringAsync(nameof(DeepSeekAPIKey), value);
+        }
 
-        public static string GetValue(string key)
+		public static string GetValue(string key)
         {
             return _cachingProvider.GetStringAsync(key).Result ?? string.Empty;
         }

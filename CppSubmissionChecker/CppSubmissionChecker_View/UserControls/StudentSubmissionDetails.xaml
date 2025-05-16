@@ -17,7 +17,7 @@
         <DockPanel LastChildFill="true">
             <Label DockPanel.Dock="Top" Content="{Binding Name}">
             </Label>
-            <TabControl >
+            <TabControl x:Name="Tabs">
                 <!--solutions -->
 
                 <TabItem Header="Solutions">

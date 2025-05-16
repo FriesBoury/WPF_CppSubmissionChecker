@@ -1,0 +1,174 @@
+﻿<UserControl x:Class="CppSubmissionChecker_View.UserControls.AutoGraderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CppSubmissionChecker_View.UserControls"
+             xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel.Viewmodels;assembly=CppSubmissionChecker_ViewModel"
+             mc:Ignorable="d" 
+             Background="{StaticResource BackgroundBrush}" 
+             DataContextChanged="UserControl_DataContextChanged" Width="500">
+    <d:UserControl.DataContext>
+        <vm:AutoGraderViewModel/>
+    </d:UserControl.DataContext>
+    <Grid>
+        <Grid>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding HasAPIKey, Converter={StaticResource BoolToInvisibility}}">
+                <Label>No API Key Set</Label>
+                <Button Command="{Binding RefreshAPIkeyCommand}">
+                    <icons:PackIconMaterial Kind="Refresh"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid x:Name="mainGrid" Visibility="{Binding HasAPIKey, Converter={StaticResource BoolToVisibilityCollapse}}">
+            <!--<Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>-->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- Load & Save-->
+            <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,30,0">
+                <Button Command="{Binding LoadRubricCommand}">Load</Button>
+                <Button Command="{Binding SaveRubricCommand}">Save</Button>
+                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" FontSize="16" Foreground="White" >Auto Graded Rubric</Label>
+            </StackPanel>
+
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!--Topic-->
+                    <Label      Grid.Row="1" Grid.Column="0">Topic</Label>
+                    <TextBox    Grid.Row="1" Grid.Column="1" 
+                            Text="{Binding RubricViewModel.Topic}"
+                            FontFamily="Courier New"
+                            TextWrapping="Wrap" AcceptsReturn="True"
+                            Padding="4"/>
+
+                    <!--Info-->
+                    <Label      Grid.Row="2" Grid.Column="0">Info</Label>
+                    <TextBox    Grid.Row="2" Grid.Column="1" 
+                            Text="{Binding RubricViewModel.Info}" 
+                            FontFamily="Courier New"
+                            TextWrapping="Wrap" AcceptsReturn="True"
+                            Padding="4"/>
+
+                    <Label Grid.Row="3" Grid.ColumnSpan="2">Items:</Label>
+                    <!-- rubric items -->
+                    <ItemsControl Grid.Row="4" Grid.ColumnSpan="2" 
+               ItemsSource="{Binding RubricViewModel.Items}" 
+               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{StaticResource CustomMediumGray}" BorderThickness="2" Padding="0,0,5,0">
+                                    <Grid Background="{StaticResource HeaderBackgroundBrush}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <!-- Delete item button -->
+                                        <Button Grid.Column="0" Grid.RowSpan="10" 
+                                            VerticalAlignment="Center"
+                                            Height="30"
+                                         Command="{Binding ElementName=mainGrid, Path=DataContext.RubricViewModel.RemoveItemCommand}"
+                                         CommandParameter="{Binding .}">
+                                            <icons:PackIconMaterial Kind="TrashCan" Height="10" Width="10"/>
+                                        </Button>
+
+                                        <!-- Item info -->
+                                        <Label Grid.Row="0" Grid.Column="1" FontSize="10" Foreground="{StaticResource CustomLightGrey}">Info:</Label>
+                                        <TextBox Grid.Row="1" Grid.Column="1" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="Wrap" Text="{Binding ItemInfo, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                                        <!-- Score -->
+                                        <!--
+                                    <Label Grid.Row="2" Grid.Column="1" FontSize="10" Foreground="{StaticResource CustomLightGrey}">Score weight:</Label>
+                                    <TextBox Grid.Row="3" Grid.Column="1" FontFamily="Courier New" Text="{Binding Score, UpdateSourceTrigger=PropertyChanged}"></TextBox>-->
+
+                                        <!-- File pattern -->
+                                        <Label Grid.Row="4" Grid.Column="1" FontSize="10" Foreground="{StaticResource CustomLightGrey}">File(s) (comma separated):</Label>
+                                        <TextBox Grid.Row="5" Grid.Column="1" FontFamily="Courier New" AcceptsReturn="False" Text="{Binding FilePattern, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                                        <!-- Result -->
+                                        <Label Grid.Row="6" Grid.Column="1" FontSize="10" 
+                                    Foreground="{StaticResource CustomGrey}" 
+                                    Visibility="{Binding HasResult, Converter={StaticResource BoolToInvisibility}}" 
+                                    FontStyle="Italic">Not graded yet...</Label>
+
+                                        <Label Margin="0,10,0,0"
+                                        Grid.Row="6" Grid.Column="1" 
+                                        FontSize="10" Foreground="{StaticResource CustomLightGrey}" 
+                                        Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibilityCollapse}}">
+                                            Grade result:
+                                        </Label>
+                                        <Border  Grid.Row="7" Grid.Column="1" BorderBrush="{StaticResource PrimaryColorBrush}" BorderThickness="1"
+                                             Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibilityCollapse}}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+
+                                                <Label>Suggested Score:</Label>
+                                                <Label Grid.Row="0" Grid.Column="1" Content="{Binding Result.SuggestedPercentage}"></Label>
+                                                <TextBox Grid.Row="1" Grid.ColumnSpan="2" FontFamily="Courier New" AcceptsReturn="True" TextWrapping="Wrap" IsEnabled="False" 
+                                          Text="{Binding Result.Comment}"
+                                                                            Padding="4"></TextBox>
+                                                <Button Grid.Row="2" Grid.Column="0" Command="{Binding GotoGradeCommand}"
+            Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibilityCollapse}}" >Go to code</Button>
+                                            </Grid>
+                                        </Border>
+
+
+                                        <!-- Is Grading -->
+                                        <Label Background="{StaticResource BackgroundBrush}" Grid.Row="6" Grid.RowSpan="3" Grid.Column="1" FontSize="10" FontFamily="Courier New" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalContentAlignment="Center" 
+                            VerticalContentAlignment="Center"
+                            Visibility="{Binding Grading, Converter={StaticResource BoolToVisibility}}" Opacity="0.9">Waiting for grades...</Label>
+
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Grid.Row="5"  Grid.ColumnSpan="2" HorizontalAlignment="Center" Command="{Binding RubricViewModel.AddItemCommand}">
+                        <icons:PackIconMaterial Kind="PlusBox"/>
+                    </Button>
+                </Grid>
+            </ScrollViewer>
+            <Button Grid.Row="2" Command="{Binding StartGradingCommand}">Start Grading</Button>
+        </Grid>
+    </Grid>
+</UserControl>

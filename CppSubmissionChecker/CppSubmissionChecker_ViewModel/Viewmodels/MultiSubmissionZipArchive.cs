@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Viewmodels;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
@@ -13,7 +14,7 @@ using System.Xml.Linq;
 
 namespace CppSubmissionChecker_ViewModel.DataClasses
 {
-	public class MultiSubmissionZipArchive : ViewmodelBase
+	public partial class MultiSubmissionZipArchive : ViewmodelBase
 	{
 		public event Action<Exception> ExceptionFired;
 
@@ -26,7 +27,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		private MarkedFileTracker _markedFileTracker;
 
 
-
+		public AutoGraderViewModel AutoGraderVM { get; }
 		//Public Properties
 		public MarkedFileTracker MarkedFileTracker => _markedFileTracker;
 		public bool HasData => _studentSubmissions.Count > 0;
@@ -37,6 +38,9 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		public AsyncRelayCommand BatchOpenInUnityCommand { get; private set; }
 
 		public bool HasSelectedSubmission => _selectedStudentSubmission != null && !Loading;
+
+		[ObservableProperty]
+		private bool _rubricOpened = false;
 
 		public List<StudentSubmission> StudentSubmissions
 		{
@@ -53,7 +57,14 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 			set
 			{
 				SwapSubmission(value);
+				StudentSubmission.ActiveSubmission = _selectedStudentSubmission;
 			}
+		}
+
+		[RelayCommand]
+		private void ToggleRubric()
+		{
+			RubricOpened = !RubricOpened;
 		}
 
 		async Task BatchOpenInUnity()
@@ -102,6 +113,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 			_zipArchive = archive;
 			_studentSubmissions = new List<StudentSubmission>();
 			_markedFileTracker = new MarkedFileTracker(Preferences.TempFolderPath);
+			AutoGraderVM = new AutoGraderViewModel(this);
 			List<string> usedNames = new List<string>();
 			foreach (var entry in archive.Entries)
 			{

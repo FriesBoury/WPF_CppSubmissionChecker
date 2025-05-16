@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <!--Converters -->
             <conv:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+            <conv:BoolToVisibilityConverter_Collapsed x:Key="BoolToVisibilityCollapse"/>
             <conv:BoolToInvisibilityConverter x:Key="BoolToInvisibility"/>
 
             <!--Colors-->
@@ -86,6 +87,10 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="Background" Value="Black"></Setter>
+                <Setter Property="Foreground" Value="White"></Setter>
             </Style>
             <Style x:Key="TextboxStyle" TargetType="{x:Type TextBox}">
                 <Setter Property="Background" Value="Black"></Setter>

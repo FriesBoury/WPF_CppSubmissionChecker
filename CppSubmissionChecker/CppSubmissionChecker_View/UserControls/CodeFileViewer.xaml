@@ -23,10 +23,10 @@
             </Grid>
         </DataTemplate>
         <DataTemplate  DataType="{x:Type previewVM:CodeFile_VM}">
-            <Grid>
-                <avalon:TextEditor 
+            <Grid >
+                <avalon:TextEditor  x:Name="txtEdit"
                                     Background="#1e1e1e"
-                                    Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged" Name="_fileTxt"
+                                    Loaded="_fileTxt_Loaded" DataContextChanged="_fileTxt_DataContextChanged"
                                     ShowLineNumbers="True"
                       
                                     FontFamily="Consolas"

@@ -20,122 +20,135 @@ using System.Windows.Threading;
 
 namespace CppSubmissionChecker_View.UserControls
 {
-    /// <summary>
-    /// Interaction logic for StudentSubmissionDetails.xaml
-    /// </summary>
-    public partial class StudentSubmissionDetails : UserControl
-    {
+	/// <summary>
+	/// Interaction logic for StudentSubmissionDetails.xaml
+	/// </summary>
+	public partial class StudentSubmissionDetails : UserControl
+	{
 
-        StudentSubmission? _submissionViewModel;
-
-
-        public StudentSubmissionDetails()
-        {
-            this.DataContextChanged += StudentSubmissionDetails_DataContextChanged;
-            InitializeComponent();
-
-        }
-
-        private void StudentSubmissionDetails_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (_submissionViewModel != null)
-            {
-                _submissionViewModel.FinishedLoading -= _submissionViewModel_FinishedLoading;
-                _submissionViewModel.UnloadRequested -= _submissionViewModel_Unloaded;
-            }
-
-            _submissionViewModel = DataContext as StudentSubmission;
-            if (_submissionViewModel != null)
-            {
-                _submissionViewModel.FinishedLoading += _submissionViewModel_FinishedLoading;
-                _submissionViewModel.UnloadRequested += _submissionViewModel_Unloaded;
-                _submissionViewModel.SetMainDispatcher(new ViewmodelDispatcher(this.Dispatcher));
-            }
-
-            _codeViewer?.CloseAllFiles();
+		StudentSubmission? _submissionViewModel;
 
 
-        }
+		public StudentSubmissionDetails()
+		{
+			this.DataContextChanged += StudentSubmissionDetails_DataContextChanged;
+			InitializeComponent();
 
-        private void _submissionViewModel_Unloaded(StudentSubmission submission)
-        {
-            UnloadSubmission(submission);
-        }
+		}
 
-        async void UnloadSubmission(StudentSubmission submission)
-        {
-            submission.IsUnloading = true;
+		private void StudentSubmissionDetails_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			if (_submissionViewModel != null)
+			{
+				_submissionViewModel.FinishedLoading -= _submissionViewModel_FinishedLoading;
+				_submissionViewModel.UnloadRequested -= _submissionViewModel_Unloaded;
+				_submissionViewModel.WatchCodeRequested -= _submissionViewModel_WatchCodeRequested;
+			}
 
-            await submission.KillRunningProcesses();
+			_submissionViewModel = DataContext as StudentSubmission;
+			if (_submissionViewModel != null)
+			{
+				_submissionViewModel.FinishedLoading += _submissionViewModel_FinishedLoading;
+				_submissionViewModel.UnloadRequested += _submissionViewModel_Unloaded;
+				_submissionViewModel.WatchCodeRequested += _submissionViewModel_WatchCodeRequested;
+				_submissionViewModel.SetMainDispatcher(new ViewmodelDispatcher(this.Dispatcher));
+			}
 
-            submission.Loaded = false;
-            submission.IsUnloading = false;
-        }
+			_codeViewer?.CloseAllFiles();
 
-        private void _submissionViewModel_FinishedLoading()
-        {
-            if (_submissionViewModel?.DirectoryTree != null)
-            {
-                OpenAllMarkedFiles(_submissionViewModel.DirectoryTree);
-            }
-        }
 
-        private void OpenAllMarkedFiles(UserDirectory dir)
-        {
-            foreach (var file in dir.Files)
-            {
-                if (file.IsMarked)
-                {
-                    _codeViewer.OpenFile(file.FilePath);
-                }
-            }
-            foreach (var subDir in dir.Subfolders)
-            {
-                OpenAllMarkedFiles(subDir);
-            }
-        }
+		}
 
-        private void _directoryTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            if (e.NewValue is UserDirectory dir)
-            {
-                //do nothing
-            }
-            else if (e.NewValue is UserFile file)
-            {
-                SelectFile(file.FilePath);
-            }
-        }
+		private void _submissionViewModel_WatchCodeRequested(string path, AutoGrading.CodeMarking obj)
+		{
+			if (obj.FileName != null)
+			{
+				this.Tabs.SelectedIndex = 2;//Go to code tab
+				var fullPath = path;
+				_codeViewer.OpenFile(fullPath);
+				_codeViewer.HighlightSection(obj.StartLine, obj.StartCharIndex, obj.EndLine, obj.EndCharIndex);
+			}
+		}
 
-        void SelectFile(string? path)
-        {
-            _codeViewer.OpenFile(path);
-        }
+		private void _submissionViewModel_Unloaded(StudentSubmission submission)
+		{
+			UnloadSubmission(submission);
+		}
 
-        private void FindInExplorer_Click(object sender, RoutedEventArgs e)
-        {
-            if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = "explorer";
-                process.StartInfo.Arguments = "/select,  " + $"\"{_submissionViewModel.SelectedSolutionPath}\"";
-                process.Start();
-            }
-        }
+		async void UnloadSubmission(StudentSubmission submission)
+		{
+			submission.IsUnloading = true;
 
-        private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if ((sender as FrameworkElement)?.DataContext is UserFile userFile)
-            {
-                if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
-                {
+			await submission.KillRunningProcesses();
 
-                    Process process = new Process();
-                    process.StartInfo.FileName = "explorer";
-                    process.StartInfo.Arguments = "/select,  " + $"\"{userFile.FilePath}\"";
-                    process.Start();
-                }
-            }
-        }
-    }
+			submission.Loaded = false;
+			submission.IsUnloading = false;
+		}
+
+		private void _submissionViewModel_FinishedLoading()
+		{
+			if (_submissionViewModel?.DirectoryTree != null)
+			{
+				OpenAllMarkedFiles(_submissionViewModel.DirectoryTree);
+			}
+		}
+
+		private void OpenAllMarkedFiles(UserDirectory dir)
+		{
+			foreach (var file in dir.Files)
+			{
+				if (file.IsMarked)
+				{
+					_codeViewer.OpenFile(file.FilePath);
+				}
+			}
+			foreach (var subDir in dir.Subfolders)
+			{
+				OpenAllMarkedFiles(subDir);
+			}
+		}
+
+		private void _directoryTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			if (e.NewValue is UserDirectory dir)
+			{
+				//do nothing
+			}
+			else if (e.NewValue is UserFile file)
+			{
+				SelectFile(file.FilePath);
+			}
+		}
+
+		void SelectFile(string? path)
+		{
+			_codeViewer.OpenFile(path);
+		}
+
+		private void FindInExplorer_Click(object sender, RoutedEventArgs e)
+		{
+			if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
+			{
+				Process process = new Process();
+				process.StartInfo.FileName = "explorer";
+				process.StartInfo.Arguments = "/select,  " + $"\"{_submissionViewModel.SelectedSolutionPath}\"";
+				process.Start();
+			}
+		}
+
+		private void Label_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if ((sender as FrameworkElement)?.DataContext is UserFile userFile)
+			{
+				if (_submissionViewModel != null && !string.IsNullOrEmpty(_submissionViewModel.SelectedSolutionPath))
+				{
+
+					Process process = new Process();
+					process.StartInfo.FileName = "explorer";
+					process.StartInfo.Arguments = "/select,  " + $"\"{userFile.FilePath}\"";
+					process.Start();
+				}
+			}
+		}
+	}
 }

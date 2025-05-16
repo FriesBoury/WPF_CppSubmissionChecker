@@ -119,5 +119,21 @@
             <Rectangle Grid.Row="0" Width="1" Height="10" Margin="10 0 0 0" Fill="{StaticResource TextBrush}"></Rectangle>
             <Rectangle Grid.Row="0" Width="10" Height="1" Margin="19 10 0 0" Fill="{StaticResource TextBrush}"></Rectangle>
         </Grid>
+        <Label HorizontalAlignment="Stretch" VerticalAlignment="Center">DeepSeek Auto Grader Settings</Label>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="2"  Grid.Column="1" ToolTip="DeepSeek API Key" Foreground="{StaticResource TextBrush}">DeepSeek API key</Label>
+            <TextBox Grid.Row="2" Grid.Column="2" Background="Black"  Text="{Binding DeepSeekAPIKey}" IsReadOnly="False" Foreground="{StaticResource TextBrush}"></TextBox>
+            <Rectangle Grid.Row="0" Width="1" Height="10" Margin="10 0 0 0" Fill="{StaticResource TextBrush}"></Rectangle>
+            <Rectangle Grid.Row="0" Width="10" Height="1" Margin="19 10 0 0" Fill="{StaticResource TextBrush}"></Rectangle>
+        </Grid>
     </StackPanel>
 </Window>

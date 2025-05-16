@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CppSubmissionChecker_View"
         xmlns:uc="clr-namespace:CppSubmissionChecker_View.UserControls"
         xmlns:vm ="clr-namespace:CppSubmissionChecker_ViewModel;assembly=CppSubmissionChecker_ViewModel"
-        
+        xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
         Title="DAE Submission Checker"  Width="1280" Height="768"
         Background="#0d1d2d" 
@@ -29,14 +29,15 @@
                 <Button HorizontalAlignment="Center" Click="LoadZip_Click">
                     <Button.ToolTip>
                         <Grid Background="{StaticResource CustomDarkGrey}" Margin="-10">
-                        <StackPanel Orientation="Vertical"  Margin="10" Width="200">
+                            <StackPanel Orientation="Vertical"  Margin="10" Width="200">
                                 <TextBlock TextWrapping="Wrap" Foreground="White">A zip with all the submissions as downloaded from LEHO:</TextBlock>
                                 <Image Source="/Resources/images/tooltip_submissionszip.png"  HorizontalAlignment="Left"/>
-                        </StackPanel>
+                            </StackPanel>
                         </Grid>
                     </Button.ToolTip>
-                    Load Zip Archive</Button>
-                
+                    Load Zip Archive
+                </Button>
+
 
             </StackPanel>
             <DockPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" LastChildFill="true" >
@@ -44,7 +45,7 @@
                     <Button Click="FraudDetection_Click">FD</Button>
                     <Button Command="{Binding SelectedArchive.BatchOpenInUnityCommand}" >Batch Open in Unity</Button>
                 </StackPanel>
-                
+
                 <TabControl>
                     <TabItem Header="Submissions">
                         <Grid Width="200">
@@ -60,7 +61,7 @@
                     </TabItem>
                 </TabControl>
 
-                <Grid DataContext="{Binding SelectedArchive}">
+                <Grid x:Name="archiveView" DataContext="{Binding SelectedArchive}">
                     <Grid Visibility="{Binding Loading, Converter={StaticResource BoolToVisibility}}">
                         <StackPanel Orientation="Horizontal" Height="Auto">
                             <Label>Loading Submission</Label>
@@ -68,10 +69,36 @@
                         </StackPanel>
                     </Grid>
                     <Grid Visibility="{Binding HasSelectedSubmission, Converter={StaticResource BoolToVisibility}}">
-                        <uc:StudentSubmissionDetails DataContext="{Binding SelectedSubmission}"></uc:StudentSubmissionDetails>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <uc:StudentSubmissionDetails Grid.Column="0" DataContext="{Binding SelectedSubmission}"/>
+                        <uc:AutoGraderView Grid.Column="1" DataContext="{Binding AutoGraderVM}" 
+                                           Visibility="{Binding ElementName=archiveView, 
+                            Path=DataContext.RubricOpened, 
+                            Converter={StaticResource BoolToVisibilityCollapse}}"/>
+                        <Button Grid.Row="0" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Right" Command="{Binding ToggleRubricCommand}"
+                                               Visibility="{Binding ElementName=archiveView, 
+                                                Path=DataContext.RubricOpened, 
+                                                Converter={StaticResource BoolToVisibilityCollapse}}">
+                            <icons:PackIconMaterial Width="10" Kind="ChevronDoubleRight"/>
+                        </Button>
+
+                        <Button Grid.Row="0" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Command="{Binding ToggleRubricCommand}"
+                           Visibility="{Binding ElementName=archiveView, 
+                            Path=DataContext.RubricOpened, 
+                            Converter={StaticResource BoolToInvisibility}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0,0,10,0">Auto Graded Rubric</TextBlock>
+                                <icons:PackIconMaterial Width="10" Kind="ChevronDoubleLeft"/>
+                            </StackPanel></Button>
                     </Grid>
+
                 </Grid>
             </DockPanel>
+
+
         </Grid>
 
 

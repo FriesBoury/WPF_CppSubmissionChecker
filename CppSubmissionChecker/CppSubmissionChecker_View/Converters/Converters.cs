@@ -10,7 +10,29 @@ using System.Windows.Navigation;
 
 namespace CppSubmissionChecker_View.Converters
 {
-    class BoolToVisibilityConverter : IValueConverter
+	class BoolToVisibilityConverter_Collapsed : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if ((bool)value)
+			{
+				return Visibility.Visible;
+			}
+			return Visibility.Collapsed;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			switch ((Visibility)value)
+			{
+				case Visibility.Visible:
+					return true;
+				default:
+					return false;
+			}
+		}
+	}
+	class BoolToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

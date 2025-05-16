@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using AutoGrading;
+using CommunityToolkit.Mvvm.Input;
 using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Interfaces;
 using CppSubmissionChecker_ViewModel.Viewmodels.TextLog;
@@ -31,12 +32,14 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
     public abstract class StudentSubmission : ViewmodelBase
     {
-
+        public static StudentSubmission? ActiveSubmission { get; set; } = null;
         public List<string> TestTabData { get; set; } = new List<string>() { "Tab01", "Tab02", "Tab03" };
 
         public event Action<string, bool> FileMarkedChanged;
         public event Action<StudentSubmission>? UnloadRequested;
         public event Action? FinishedLoading;
+        public event Action<string,CodeMarking> WatchCodeRequested;
+
 
         public bool Loaded { get; set; } = false;
         // Public Properties
@@ -495,7 +498,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             return $"{studentName}_{submissionNr}";
 
         }
-        internal string? GetRelativeFile(string markedFilePath)
+        public string? GetRelativeFile(string markedFilePath)
         {
             if (FullDirPath == null) return null;
 
@@ -512,6 +515,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             string path = Path.GetFullPath(Path.Combine(rootFolderPath, markedFilePath));
             if (File.Exists(path)) { return path; }
             return null;
+        }
+
+
+        public void WatchCodeFile(string filePath, CodeMarking marking)
+        {
+            WatchCodeRequested.Invoke(filePath,marking);
         }
     }
 }
