@@ -63,6 +63,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels
 			if (string.IsNullOrEmpty(matchingFilePath)) return;
 
 			StudentSubmission.ActiveSubmission.WatchCodeFile(matchingFilePath, _result.MarkedCodePart);
+
 		}
 	}
 
@@ -199,6 +200,12 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels
 		public Rubric? GetRubric()
 		{
 			return RubricViewModel.Rubric;
+		}
+
+		[RelayCommand]
+		private async Task GradeItem(RubricItemViewModel item)
+		{
+			await _autoGrader.GradeItemAsync(item.Item);
 		}
 
 

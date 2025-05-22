@@ -51,19 +51,25 @@ namespace CppSubmissionChecker_View.UserControls
 		}
 		public void HighlightSection(int startLine, int startChar, int endLine, int endChar)
 		{
-			var editor = _fileTabControl.FindChild<TextEditor>();
-			if (editor == null) return;
+			try
+			{
+				var editor = _fileTabControl.FindChild<TextEditor>();
+				if (editor == null) return;
 
-			editor.ScrollToLine(startLine);
+				editor.ScrollToLine(startLine);
 
 
-			//calculate startchar
-			int startCharIndex = StringIndexHelper.GetAbsoluteIndex(editor.Text, startLine, startChar);
-			int endCharIndex = StringIndexHelper.GetAbsoluteIndex(editor.Text, endLine, endChar);
+				//calculate startchar
+				int startCharIndex = StringIndexHelper.GetAbsoluteIndex(editor.Text, startLine, startChar);
+				int endCharIndex = StringIndexHelper.GetAbsoluteIndex(editor.Text, endLine, endChar);
 
-			editor.SelectionStart = startCharIndex;
-			editor.SelectionLength = endCharIndex - startCharIndex;
-			
+				editor.SelectionStart = startCharIndex;
+				editor.SelectionLength = endCharIndex - startCharIndex;
+			}
+			catch(Exception e)
+			{
+				MessageBox.Show(Window.GetWindow(this), e.Message, "Failed to highlight text", MessageBoxButton.OK, MessageBoxImage.Error); 
+			}
 
 
 		}

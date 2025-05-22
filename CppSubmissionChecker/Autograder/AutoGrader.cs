@@ -1,12 +1,5 @@
 ﻿namespace AutoGrading
 {
-	public class RubricItem
-	{
-		public Guid Id { get; set; }
-		public float Score { get; set; }
-		public string ItemInfo { get; set; } = "";
-		public string FileNamePattern { get; set; } = "";
-	}
 	public class AutoGrader
 	{
 		private readonly IRubricProvider _rubricProvider;
@@ -23,6 +16,25 @@
 		public List<RubricItem> GetAllRubricItems()
 		{
 			return _rubricProvider.GetRubric()?.Items ?? new();
+		}
+
+		public async Task<GradingResult?> GradeItemAsync(RubricItem item)
+		{
+			var rubric = _rubricProvider.GetRubric();
+			if (rubric == null) return null;
+
+			try
+			{
+				var filePaths = _fileContentProvider.GetFilePaths(item.FileNamePattern);
+				var result = await _gradingProvider.GradeAsync(rubric, item, filePaths);
+				return result;
+			}
+			catch(Exception e)
+			{
+				return new() { Comment = "Failed to assess item.\n"+e.Message, GradedItem = item};
+			}
+
+
 		}
 		public async Task<List<GradingResult>> GradeAllAsync()
 		{
@@ -50,7 +62,7 @@
 			{
 				await Task.WhenAll(runningTasks);
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 
 			}

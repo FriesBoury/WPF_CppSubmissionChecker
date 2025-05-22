@@ -10,6 +10,7 @@
             <conv:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
             <conv:BoolToVisibilityConverter_Collapsed x:Key="BoolToVisibilityCollapse"/>
             <conv:BoolToInvisibilityConverter x:Key="BoolToInvisibility"/>
+            <conv:ScoreToColorBrushConverter x:Key="ScoreToColor"/>
 
             <!--Colors-->
             <Color x:Key="BackgroundColor" >#1d2d3d</Color>

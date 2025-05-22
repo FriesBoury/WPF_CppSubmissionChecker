@@ -128,7 +128,7 @@
                                             Grade result:
                                         </Label>
                                         <Border  Grid.Row="7" Grid.Column="1" BorderBrush="{StaticResource PrimaryColorBrush}" BorderThickness="1"
-                                             Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibilityCollapse}}">
+                                             Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibilityCollapse}}" Background="{Binding Result.SuggestedPercentage, Converter={StaticResource ScoreToColor}}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto"/>
