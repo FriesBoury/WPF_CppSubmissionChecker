@@ -34,13 +34,16 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		public bool Loading { get; private set; }
 
 		public float LoadingProgress { get; private set; }
+		public string ArchiveName { get; }
 
 		public AsyncRelayCommand BatchOpenInUnityCommand { get; private set; }
-
 		public bool HasSelectedSubmission => _selectedStudentSubmission != null && !Loading;
 
 		[ObservableProperty]
 		private bool _rubricOpened = false;
+
+		[ObservableProperty]
+		private DateTime? _submissionActivatedTimeStamp = null;
 
 		public List<StudentSubmission> StudentSubmissions
 		{
@@ -105,12 +108,14 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 			}
 			OnPropertyChanged(nameof(SelectedSubmission));
 			OnPropertyChanged(nameof(HasSelectedSubmission));
+			SubmissionActivatedTimeStamp = DateTime.UtcNow;
 		}
 
 		//Constructor
-		public MultiSubmissionZipArchive(ZipArchive archive, SubmissionFactory submissionFactory)
+		public MultiSubmissionZipArchive(ZipArchive archive, string archiveName, SubmissionFactory submissionFactory)
 		{
 			_zipArchive = archive;
+			ArchiveName = archiveName;
 			_studentSubmissions = new List<StudentSubmission>();
 			_markedFileTracker = new MarkedFileTracker(Preferences.TempFolderPath);
 			AutoGraderVM = new AutoGraderViewModel(this);
@@ -160,6 +165,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		async Task UnloadSubmission(StudentSubmission submission)
 		{
 			await submission.Unload();
+			SubmissionActivatedTimeStamp = null;
 		}
 
 		public async Task ExtractSubmission(StudentSubmission submission)
@@ -187,6 +193,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 
 			Loading = false;
 			OnPropertyChanged(nameof(Loading));
+
 		}
 	}
 }

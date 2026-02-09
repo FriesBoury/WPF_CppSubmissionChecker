@@ -8,11 +8,10 @@
              xmlns:local="clr-namespace:CppSubmissionChecker_View.UserControls"
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
-             mc:Ignorable="d" 
-             d:DesignHeight="768" d:DesignWidth="1028">
-    <d:UserControl.DataContext>
-        <vmUnity:StudentSubmission/>
-    </d:UserControl.DataContext>
+            >
+    <!--<d:UserControl.DataContext>
+        <vmUnity:StudentSubmission_Unity/>
+    </d:UserControl.DataContext>-->
     <Grid>
         <DockPanel LastChildFill="true">
             <Label DockPanel.Dock="Top" Content="{Binding Name}">

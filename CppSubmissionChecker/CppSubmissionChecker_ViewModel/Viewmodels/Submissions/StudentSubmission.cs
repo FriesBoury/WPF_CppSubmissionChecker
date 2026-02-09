@@ -1,4 +1,5 @@
 ﻿using AutoGrading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Interfaces;
@@ -116,7 +117,10 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 
             FullDirPath = "SomeDir";
             StudentName = Name.Substring(0, Name.IndexOf('_', 2));
-        }
+
+
+			
+		}
         public StudentSubmission(string longName, string shortName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker)
         {
             _archiveEntry = archiveEntry;
@@ -127,9 +131,19 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             OpenInVSCommand = new AsyncRelayCommand(OpenInVS);
             ClearArgsCommand = new RelayCommand(() => { ExecutableArgs = string.Empty; });
             ExecutableArgs = Preferences.GetValue(nameof(ExecutableArgs));
-        }
 
-        protected virtual async Task OpenInVS()
+			int firstUnderscoreIdx = longName.IndexOf('_');
+			int secondUnderscoreIdx = longName.IndexOf('_', firstUnderscoreIdx + 1);
+			if (StudentName.Length < 8)
+			{
+                StudentName = longName.Substring(firstUnderscoreIdx);
+			}
+
+
+
+		}
+
+		protected virtual async Task OpenInVS()
         {
             if (!string.IsNullOrEmpty(SelectedSolutionPath))
             {
@@ -275,8 +289,9 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
                 //Find SLNPath
                 List<string> paths = new List<string>();
                 FindFilesWithExtension(FullDirPath, ".sln", ref paths);
+                FindFilesWithExtension(FullDirPath, ".slnx", ref paths);
 
-                List<string> cmake = new List<string>();
+				List<string> cmake = new List<string>();
                 //Find CMAkeLists.txt
                 FindFilesWithExtension(FullDirPath, "CMakelists.txt", ref cmake);
 
@@ -468,7 +483,13 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
         //To have an unique folder per student, we take studentname_<submissionNr>
         private static string TruncateArchiveName(string archiveName)
         {
+
             int firstUnderscoreIdx = archiveName.IndexOf('_');
+            int secondUnderscoreIdx = archiveName.IndexOf('_', firstUnderscoreIdx + 1);
+            if(archiveName.StartsWith("AG2425")) //hot fix, hard coded
+            {
+                return archiveName.Substring(firstUnderscoreIdx);
+            }
             string studentName = archiveName.Substring(0,firstUnderscoreIdx);
 
             //find submissionNr

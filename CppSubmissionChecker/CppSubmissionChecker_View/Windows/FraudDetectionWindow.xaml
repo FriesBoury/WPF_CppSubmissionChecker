@@ -8,71 +8,130 @@
         xmlns:uc="clr-namespace:CppSubmissionChecker_View.UserControls"
         xmlns:vm="clr-namespace:CppSubmissionChecker_ViewModel.FraudDetection;assembly=CppSubmissionChecker_ViewModel"
         mc:Ignorable="d"
-        Title="FraudDetectionWindow" MinHeight="450" MinWidth="800" Background="{StaticResource BackgroundBrush}">
+        Title="FraudDetectionWindow"
+        MinHeight="450"
+        MinWidth="800"
+        Background="{StaticResource BackgroundBrush}">
     <d:Window.DataContext>
-        <vm:FraudDetection/>
+        <vm:FraudDetection />
     </d:Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Command="{Binding ExtractCommand}">Extract all</Button>
-            <Button Grid.Column="1" Command="{Binding BuildDiffCommand}">Create Diff</Button>
-            <Button Grid.Column="2" Command="{Binding StartAnalyzeCommand}">Analyze</Button>
+            <Button Grid.Column="0"
+                    Command="{Binding ExtractCommand}">Extract all</Button>
+            <Button Grid.Column="1"
+                    Command="{Binding BuildDiffCommand}">Create Diff</Button>
+            <Button Grid.Column="2"
+                    Command="{Binding StartAnalyzeCommand}">Analyze</Button>
         </Grid>
         <TabControl Grid.Row="1">
             <TabItem Header="Files">
                 <StackPanel Orientation="Vertical">
-                    <ItemsControl Background="Black" ItemsSource="{Binding FilesToCheck}" Margin="5,5,5,0">
+                    <ItemsControl Background="Black"
+                                  ItemsSource="{Binding FilesToCheck}"
+                                  Margin="5,5,5,0">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid  HorizontalAlignment="Stretch" >
+                                <Grid  HorizontalAlignment="Stretch">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
                                     <Button Command="{Binding DeleteCommand}">
-                                        <icons:PackIconMaterial Kind="TrashCan" Height="10"></icons:PackIconMaterial>
+                                        <icons:PackIconMaterial Kind="TrashCan"
+                                                                Height="10"></icons:PackIconMaterial>
                                     </Button>
-                                    <TextBox Grid.Column="1" Text="{Binding FilePath}" Background="Black" Foreground="white"></TextBox>
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding FilePath}"
+                                             Background="Black"
+                                             Foreground="white"></TextBox>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Button HorizontalAlignment="Left" Width="100" Margin="5" Command="{Binding AddFileCommand}">
+                    <Button HorizontalAlignment="Left"
+                            Width="100"
+                            Margin="5"
+                            Command="{Binding AddFileCommand}">
                         <icons:PackIconMaterial Kind="PlusBox"></icons:PackIconMaterial>
                     </Button>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Console Output">
-                <uc:TextLog DataContext="{Binding Logs}"/>
+                <uc:TextLog DataContext="{Binding Logs}" />
             </TabItem>
             <TabItem Header="Analysis Results">
-                <ListView  Background="{StaticResource StandardBackgroundBrush}" ItemsSource="{Binding DetectionResults}" Foreground="White">
+                <ListView  Background="{StaticResource StandardBackgroundBrush}"
+                           ItemsSource="{Binding DetectionResults}"
+                           Foreground="White">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <Label Content="{Binding Submission.StudentName}"/>
-                                <Label Grid.Column="1" Content="{Binding DetectionResult}"/>
+                                <Label Content="{Binding Submission.StudentName}" />
+                                <Label Grid.Column="1"
+                                       Content="{Binding DetectionResult}" />
                             </Grid>
 
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+
+            </TabItem>
+            <TabItem Header="Find (in) Files">
+                <Grid HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Vertical">
+                        <Grid HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="0"
+                                   Grid.Row="0">File path pattern</Label>
+                            <TextBox Grid.Column="1"
+                                     Text="{Binding FindInFilesSettings.FilePathPattern}"
+                                     Background="Black"
+                                     Foreground="white"></TextBox>
+                            <Label Grid.Column="0"
+                                   Grid.Row="1">Content pattern</Label>
+                            <TextBox Grid.Column="1"
+                                     Grid.Row="1"
+                                     Text="{Binding FindInFilesSettings.ContentPattern}"
+                                     Background="Black"
+                                     Foreground="white"></TextBox>
+                        </Grid>
+                        <Button Command="{Binding FindInFilesSettings.FindMatchesCommand}">Run</Button>
+
+                        <Label>Output:</Label>
+                    </StackPanel>
+                    <uc:TextLog Grid.Row="1"
+                                DataContext="{Binding FindInFilesSettings.TextLog}" />
+                </Grid>
 
             </TabItem>
         </TabControl>

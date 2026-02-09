@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.FilePreview
 {
+    
     public class MediaFile_VM : FilePreviewBaseVM
     {
         public RelayCommand? TogglePlayMedia { get; private set; }

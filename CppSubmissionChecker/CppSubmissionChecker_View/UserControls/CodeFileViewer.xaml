@@ -22,6 +22,11 @@
                 </Button>
             </Grid>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type previewVM:PDFFile_VM}">
+            <Grid>
+                <local:PDFViewer DataContext="{Binding}" />
+            </Grid>
+        </DataTemplate>
         <DataTemplate  DataType="{x:Type previewVM:CodeFile_VM}">
             <Grid >
                 <avalon:TextEditor  x:Name="txtEdit"

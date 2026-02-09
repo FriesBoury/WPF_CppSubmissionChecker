@@ -201,7 +201,7 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
             {
                 await base.OpenInVS();
             }
-            if (!string.IsNullOrEmpty(SelectedSolutionPath))
+            else if (!string.IsNullOrEmpty(SelectedSolutionPath))
             {
                 Process process = new Process();
                 process.StartInfo.FileName = Preferences.VisualStudioPath;

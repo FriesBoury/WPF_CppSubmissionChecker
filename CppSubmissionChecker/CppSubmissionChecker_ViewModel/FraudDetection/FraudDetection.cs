@@ -1,10 +1,12 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CppSubmissionChecker_ViewModel.DataClasses;
 using CppSubmissionChecker_ViewModel.Viewmodels;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
 using CppSubmissionChecker_ViewModel.Viewmodels.TextLog;
 using DiffPlex.DiffBuilder;
 using DiffPlex.DiffBuilder.Model;
+using SharpCompress.Archives;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
@@ -45,12 +47,85 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
 
         public RelayCommand DeleteCommand { get; private set; }
     }
-
-    public class FraudDetection : ViewmodelBase
+    public partial class FindInFilesSettings: ObservableObject
     {
+		private readonly MultiSubmissionZipArchive? _archive;
+		public FindInFilesSettings(MultiSubmissionZipArchive? archive)
+		{
+            _archive = archive;
+		}
 
+		[ObservableProperty]
+        private string _filePathPattern = string.Empty;
 
+        [ObservableProperty]
+        private string _contentPattern = string.Empty;
 
+        public TextLog_VM TextLog { get; } = new();
+
+        [RelayCommand]
+        private async Task FindMatches()
+        {
+			if (_archive == null) return;
+            if (string.IsNullOrEmpty(_filePathPattern)) return;
+			TextLog.Clear();
+
+            await ExtractAllSubmissions();
+            TextLog.WriteLine("Starting search for matches");
+			foreach (var submission in _archive.StudentSubmissions)
+			{
+				var result = await FindMatchingFile(_filePathPattern, submission);
+				if (result)
+				{
+					TextLog.WriteLine($"!!! ==========================!!! ");
+					TextLog.WriteLine($"!!! Found match in submission !!! ");
+					TextLog.WriteLine($"!!! ==========================!!! ");
+                    TextLog.WriteLine("");
+                    TextLog.WriteLine($"student name: {submission.StudentName}");
+                    TextLog.WriteLine("");
+				}
+                else
+                {
+
+                 TextLog.WriteLine($"No match found in submission {submission.StudentName}");
+                }
+			}
+			TextLog.WriteLine("Finished");
+		}
+
+		public async Task ExtractAllSubmissions()
+		{
+			if (_archive == null) return;
+			
+			TextLog.WriteLine("Starting to extract submissions...");
+			foreach (var submission in _archive.StudentSubmissions)
+			{
+				TextLog.WriteLine($"Extracting submission {submission.StudentName}");
+				await _archive.ExtractSubmission(submission);
+
+			}
+			TextLog.WriteLine($"{_archive.StudentSubmissions.Count(s => s.Loaded)} submissions extracted - {_archive.StudentSubmissions.Count(s => !s.Loaded)} failed.");
+		}
+
+		async Task<bool> FindMatchingFile(string markedFilePath, StudentSubmission submission)
+		{
+			if (markedFilePath.StartsWith('\\'))
+				markedFilePath = markedFilePath.Substring(1);
+
+			string? filePath = submission.GetRelativeFile(markedFilePath);
+			if (string.IsNullOrEmpty(filePath))
+			{
+                return false;
+			}
+            await Task.Delay(0);
+            return true;
+            
+
+		}
+
+	}
+	public class FraudDetection : ViewmodelBase
+    {
         public bool AllSubmissionsExtracted { get; private set; }
         public bool GlobalDiffBuilt { get; private set; }
         public bool Working { get; private set; }
@@ -59,7 +134,6 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
         public AsyncRelayCommand StartAnalyzeCommand { get; private set; }
         public AsyncRelayCommand ExtractCommand { get; private set; }
         public AsyncRelayCommand BuildDiffCommand { get; private set; }
-
         public RelayCommand AddFileCommand { get; private set; }
 
 
@@ -71,6 +145,8 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
         private readonly MultiSubmissionZipArchive? _archive;
         private readonly MarkedFileTracker? _fileTracker;
         private string _diffFolderPath;
+
+        public FindInFilesSettings FindInFilesSettings { get; }
 
         public ObservableCollection<FileEntry> FilesToCheck { get; private set; }
 
@@ -86,7 +162,7 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
             BuildDiffCommand = new AsyncRelayCommand(BuildGlobalDiff, () => AllSubmissionsExtracted && !Working);
             Logs = new TextLog_VM();
 
-
+            FindInFilesSettings = new FindInFilesSettings(null);
         }
 
 
@@ -108,7 +184,9 @@ namespace CppSubmissionChecker_ViewModel.FraudDetection
 
             AddFileCommand = new RelayCommand(AddFile);
 
-        }
+			FindInFilesSettings = new FindInFilesSettings(archive);
+
+		}
 
         private void AddFile()
         {
