@@ -34,6 +34,13 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		public AsyncRelayCommand BatchCommand { get; private set; }
 		public bool HasSelectedSubmission => _selectedStudentSubmission != null && !Loading;
 
+
+		[ObservableProperty]
+		private int _batchStartIndex;
+		[ObservableProperty]
+		private int _batchCount;
+
+
 		[ObservableProperty]
 		private bool _rubricOpened = false;
 
@@ -66,12 +73,15 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		}
 		async Task BatchBuildUnreal()
 		{
+
 			BatchOperationStats operationStats = new BatchOperationStats("Batch building Unreal projects.");
-			operationStats.NumActionsToDo = StudentSubmissions.Count;
+			var submissionsToDo = StudentSubmissions.Skip(BatchStartIndex).Take(BatchCount);
+
+			operationStats.NumActionsToDo = submissionsToDo.Count();
 
 			BatchOperationStarted?.Invoke(operationStats);
 
-			foreach (var submission in StudentSubmissions)
+			foreach (var submission in submissionsToDo)
 			{
 				operationStats.ActionsStarted++;
 				if (submission is not StudentSubmission_Unreal ss_unreal)
@@ -79,7 +89,8 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 					operationStats.ActionsCompleted++;
 					continue;
 				}
-
+				SelectedSubmission = submission;
+				ss_unreal.SelectedOutputTabIndex = 0;
 				await ExtractSubmission(submission);
 				await ss_unreal.BuildAndRun_Unreal(false);
 				operationStats.ActionsCompleted++;
@@ -91,11 +102,13 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		async Task BatchOpenInUnity()
 		{
 			BatchOperationStats operationStats = new BatchOperationStats("Batch opening unity projects.");
-			operationStats.NumActionsToDo = StudentSubmissions.Count;
+			var submissionsToDo = StudentSubmissions.Skip(BatchStartIndex).Take(BatchCount);
+
+			operationStats.NumActionsToDo = submissionsToDo.Count();
 
 			BatchOperationStarted?.Invoke(operationStats);
 
-			foreach (var submission in StudentSubmissions)
+			foreach (var submission in submissionsToDo)
 			{
 				operationStats.ActionsStarted++;
 				if (submission is not StudentSubmission_Unity ss_unity)
@@ -180,6 +193,9 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 			{
 				BatchCommand = new AsyncRelayCommand(BatchBuildUnreal);
 			}
+
+			BatchStartIndex = 0;
+			BatchCount = StudentSubmissions.Count;
 
 		}
 

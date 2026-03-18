@@ -67,8 +67,10 @@ namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 			{
 				if (!string.IsNullOrEmpty(SelectedSolutionPath))
 				{
-					var process = Process.Start("explorer", "\"" + SelectedSolutionPath + "\"");
 
+					var process = new Process();
+					process.StartInfo.FileName = "explorer";
+					process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
 					_runningProcesses.Add(process);
 					await RunAndMonitorProcess(process, BuildOutput, true, null);
 					_runningProcesses.Remove(process);

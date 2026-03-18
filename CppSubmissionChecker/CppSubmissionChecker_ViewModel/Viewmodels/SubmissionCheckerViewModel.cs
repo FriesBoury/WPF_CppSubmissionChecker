@@ -22,7 +22,6 @@ namespace CppSubmissionChecker_ViewModel
 			SubmissionFactory = new SubmissionFactory();
 		}
 
-
 		public MultiSubmissionZipArchive? SelectedArchive
 		{
 			get => _selectedArchive;
