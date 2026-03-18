@@ -1,16 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using CppSubmissionChecker_ViewModel.Data;
 using CppSubmissionChecker_ViewModel.Viewmodels;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
-using SharpCompress.Archives;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace CppSubmissionChecker_ViewModel.DataClasses
 {
@@ -22,6 +14,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		//Private fields
 		private const string _subDirName = "SubmissionChecker";
 		private ZipArchive _zipArchive;
+		private readonly SubmissionFactory _submissionFactory;
 		private List<StudentSubmission> _studentSubmissions;
 		private StudentSubmission? _selectedStudentSubmission;
 		private MarkedFileTracker _markedFileTracker;
@@ -36,7 +29,9 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		public float LoadingProgress { get; private set; }
 		public string ArchiveName { get; }
 
-		public AsyncRelayCommand BatchOpenInUnityCommand { get; private set; }
+		public bool CanBatchOpen => StudentSubmissions.Any(s => s is StudentSubmission_Unity || s is StudentSubmission_Unreal);
+		public string BatchOpenText => _submissionFactory.SelectedType.Contains("Unity") ? "Batch open in Unity" : "Batch build Unreal projects";
+		public AsyncRelayCommand BatchCommand { get; private set; }
 		public bool HasSelectedSubmission => _selectedStudentSubmission != null && !Loading;
 
 		[ObservableProperty]
@@ -69,7 +64,30 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		{
 			RubricOpened = !RubricOpened;
 		}
+		async Task BatchBuildUnreal()
+		{
+			BatchOperationStats operationStats = new BatchOperationStats("Batch building Unreal projects.");
+			operationStats.NumActionsToDo = StudentSubmissions.Count;
 
+			BatchOperationStarted?.Invoke(operationStats);
+
+			foreach (var submission in StudentSubmissions)
+			{
+				operationStats.ActionsStarted++;
+				if (submission is not StudentSubmission_Unreal ss_unreal)
+				{
+					operationStats.ActionsCompleted++;
+					continue;
+				}
+
+				await ExtractSubmission(submission);
+				await ss_unreal.BuildAndRun_Unreal(false);
+				operationStats.ActionsCompleted++;
+
+			}
+
+			operationStats.OnCompleted();
+		}
 		async Task BatchOpenInUnity()
 		{
 			BatchOperationStats operationStats = new BatchOperationStats("Batch opening unity projects.");
@@ -116,6 +134,7 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 		{
 			_zipArchive = archive;
 			ArchiveName = archiveName;
+			_submissionFactory = submissionFactory;
 			_studentSubmissions = new List<StudentSubmission>();
 			_markedFileTracker = new MarkedFileTracker(Preferences.TempFolderPath);
 			AutoGraderVM = new AutoGraderViewModel(this);
@@ -153,7 +172,15 @@ namespace CppSubmissionChecker_ViewModel.DataClasses
 
 			StudentSubmissions = StudentSubmissions.OrderBy(x => x.StudentName).ToList();
 
-			BatchOpenInUnityCommand = new AsyncRelayCommand(BatchOpenInUnity);
+			if (_submissionFactory.SelectedType.Contains("Unity"))
+			{
+				BatchCommand = new AsyncRelayCommand(BatchOpenInUnity);
+			}
+			else if (_submissionFactory.SelectedType.Contains("Unreal"))
+			{
+				BatchCommand = new AsyncRelayCommand(BatchBuildUnreal);
+			}
+
 		}
 
 		private void SetLoadingProgress(float progress)

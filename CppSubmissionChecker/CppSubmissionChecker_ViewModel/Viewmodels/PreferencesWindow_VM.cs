@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CppSubmissionChecker_ViewModel
+﻿namespace CppSubmissionChecker_ViewModel
 {
 	public class PreferencesWindow_VM : ViewmodelBase
 	{
@@ -75,6 +69,24 @@ namespace CppSubmissionChecker_ViewModel
 				OnPropertyChanged(nameof(UnityInstallation));
 			}
 		}
+		public string UnrealBuildPath
+		{
+			get => Preferences.UnrealBuildPath;
+			set
+			{
+				Preferences.UnrealBuildPath = value;
+				OnPropertyChanged(nameof(UnrealBuildPath));
+			}
+		}
+		public string RiderPath
+		{
+			get => Preferences.RiderPath;
+			set
+			{
+				Preferences.RiderPath = value;
+				OnPropertyChanged(nameof(RiderPath));
+			}
+		}
 
 		public string DeepSeekAPIKey
 		{
@@ -96,6 +108,25 @@ namespace CppSubmissionChecker_ViewModel
 			{
 				MSBuildLocation = msBuildPath;
 			}
+		}
+
+		public void SetUnrealFolder(string path)
+		{
+			string? unrealBuildPath = SearchFileRecursively("Build.bat", path);
+			if (!string.IsNullOrEmpty(unrealBuildPath))
+			{
+				UnrealBuildPath = unrealBuildPath;
+			}
+
+		}
+		public void SetRiderFolder(string path)
+		{
+			string? exePath = SearchFileRecursively("rider64.exe", path);
+			if (!string.IsNullOrEmpty(exePath))
+			{
+				RiderPath = exePath;
+			}
+
 		}
 
 		private static string? SearchFileRecursively(string fileName, string directoryPath)

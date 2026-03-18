@@ -10,7 +10,7 @@
              xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
             >
     <!--<d:UserControl.DataContext>
-        <vmUnity:StudentSubmission_Unity/>
+        <vmUnity:StudentSubmission_Unreal/>
     </d:UserControl.DataContext>-->
     <Grid>
         <DockPanel LastChildFill="true">
@@ -54,11 +54,13 @@
                                 </ItemsControl.ItemTemplate>
                                
                             </ItemsControl>
-                           
-                            <Button HorizontalAlignment="Left" Command="{Binding OpenInVSCommand}">
+                            <Button HorizontalAlignment="Left"
+                                    Command="{Binding OpenInVSCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <icons:PackIconMaterial Kind="MicrosoftVisualStudio"  VerticalAlignment="Stretch" Foreground="Purple"></icons:PackIconMaterial>
-                                    <Label>Open in Microsoft Visual Studio</Label>
+                                    <icons:PackIconMaterial Kind="CodeBraces"
+                                                            VerticalAlignment="Stretch"
+                                                            Foreground="Purple"></icons:PackIconMaterial>
+                                    <Label  Content="{Binding OpenInIDEText}"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>

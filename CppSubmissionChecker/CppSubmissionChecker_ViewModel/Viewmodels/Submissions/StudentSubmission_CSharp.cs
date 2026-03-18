@@ -1,280 +1,275 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using CppSubmissionChecker_ViewModel.Viewmodels.TextLog;
-using System;
-using System.Collections.Generic;
+﻿using CppSubmissionChecker_ViewModel.Viewmodels.TextLog;
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel.Viewmodels.Submissions
 {
-    public class StudentSubmission_CSharp : StudentSubmission
-    {
-        private int _selectedOutputTab;
+	public class StudentSubmission_CSharp : StudentSubmission
+	{
+		private int _selectedOutputTab;
 
-        public TextLog_VM BuildOutput
-        {
-            get; private set;
-        } = new TextLog_VM();
+		public TextLog_VM BuildOutput
+		{
+			get; private set;
+		} = new TextLog_VM();
 
-        public TextLog_VM BuildExecutionOutput
-        {
-            get; private set;
-        } = new TextLog_VM();
+		public TextLog_VM BuildExecutionOutput
+		{
+			get; private set;
+		} = new TextLog_VM();
 
-        public int SelectedOutputTabIndex
-        {
-            get => _selectedOutputTab;
-            set
-            {
-                _selectedOutputTab = value;
-                OnPropertyChanged(nameof(SelectedOutputTabIndex));
-            }
-        }
+		public int SelectedOutputTabIndex
+		{
+			get => _selectedOutputTab;
+			set
+			{
+				_selectedOutputTab = value;
+				OnPropertyChanged(nameof(SelectedOutputTabIndex));
+			}
+		}
 
-        protected List<Process> _runningProcesses = new List<Process>();
-        public StudentSubmission_CSharp(string longName, string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(longName, studentName, archiveEntry, tracker)
-        {
+		protected List<Process> _runningProcesses = new List<Process>();
+		public StudentSubmission_CSharp(string longName, string studentName, ZipArchiveEntry archiveEntry, MarkedFileTracker tracker) : base(longName, studentName, archiveEntry, tracker)
+		{
 
-            _submissionCommands.Add(new SubmissionCommand("Build And Run [Debug]", () => { BuildAndRun(false); }));
-            _submissionCommands.Add(new SubmissionCommand("Build And Run [Release]", () => { BuildAndRun(true); }));
+			_submissionCommands.Add(new SubmissionCommand("Build And Run [Debug]", () => { BuildAndRun(false); }));
+			_submissionCommands.Add(new SubmissionCommand("Build And Run [Release]", () => { BuildAndRun(true); }));
 
-        }
+		}
 
-        private async void BuildAndRun(bool release)
-        {
-            if (IsCMakeProject())
-            {
-                await BuildAndRun_CMake(release);
-            }
-            else
-            {
-                await BuildAndRun_MsBuild(release);
-            }
-        }
-
-
-        private async Task BuildAndRun_MsBuild(bool release)
-        {
-            SelectedOutputTabIndex = 0;
-            try
-            {
-                if (!string.IsNullOrEmpty(SelectedSolutionPath))
-                {
-                    string? executablePath = null;
-                    Process process = new Process();
-                    process.StartInfo.FileName = Preferences.MSBuildPath;
-                    process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
-                    if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
-                    {
-                        process.StartInfo.Arguments += " " + Preferences.BuildParams;
-                    }
-
-                    if (!process.StartInfo.Arguments.Contains("Configuration"))
-                    {
-                        process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
-                    }
-
-                    _runningProcesses.Add(process);
-                    await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
-                    {
-                        if (outputLine != null && (outputLine.Contains(".exe")|| outputLine.Contains(".dll")) && outputLine.Contains("->"))
-                        {
-                            executablePath = outputLine;
-                            TrimExecutablePath(ref executablePath);
-                        }
-                    });
-                    _runningProcesses.Remove(process);
-
-                    if (!string.IsNullOrEmpty(executablePath) && executablePath.EndsWith(".dll"))
-                    {
-                       executablePath = executablePath.Replace(".dll", ".exe");
-                    }
-
-                    if (executablePath != null)
-                    {
-                        SelectedOutputTabIndex = 1;
-                        //Run the build
-                        Process runProcess = new Process();
-                        _runningProcesses.Add(process);
-                        runProcess.StartInfo.FileName = executablePath;
-                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(executablePath);
-                        await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
-                        _runningProcesses.Remove(process);
-                    }
+		private async void BuildAndRun(bool release)
+		{
+			if (IsCMakeProject())
+			{
+				await BuildAndRun_CMake(release);
+			}
+			else
+			{
+				await BuildAndRun_MsBuild(release);
+			}
+		}
 
 
-                }
-            }
-            catch (Exception exc)
-            {
-                SelectedOutputTabIndex = 0;
-                BuildOutput.WriteLine("===========ERROR==========");
-                BuildOutput.WriteLine("Build and Run encountered an exception: " + exc.Message);
+		private async Task BuildAndRun_MsBuild(bool release)
+		{
+			SelectedOutputTabIndex = 0;
+			try
+			{
+				if (!string.IsNullOrEmpty(SelectedSolutionPath))
+				{
+					string? executablePath = null;
+					Process process = new Process();
+					process.StartInfo.FileName = Preferences.MSBuildPath;
+					process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
+					if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
+					{
+						process.StartInfo.Arguments += " " + Preferences.BuildParams;
+					}
 
-            }
-        }
+					if (!process.StartInfo.Arguments.Contains("Configuration"))
+					{
+						process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
+					}
 
-        protected async Task RunAndMonitorProcess(Process process, TextLog_VM console, bool hideConsole, Action<string?>? receivedOutput)
-        {
-            process.StartInfo.RedirectStandardError = true;
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = hideConsole;
-            process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-            console.Clear();
+					_runningProcesses.Add(process);
+					await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
+					{
+						if (outputLine != null && (outputLine.Contains(".exe") || outputLine.Contains(".dll")) && outputLine.Contains("->"))
+						{
+							executablePath = outputLine;
+							TrimExecutablePath(ref executablePath);
+						}
+					});
+					_runningProcesses.Remove(process);
 
-            Action<string> appendText = (txt) => { console.WriteLine(txt); };
+					if (!string.IsNullOrEmpty(executablePath) && executablePath.EndsWith(".dll"))
+					{
+						executablePath = executablePath.Replace(".dll", ".exe");
+					}
 
-            process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
-            {
-                if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data);
-                receivedOutput?.Invoke(e.Data);
-            });
-            process.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
-            {
+					if (executablePath != null)
+					{
+						SelectedOutputTabIndex = 1;
+						//Run the build
+						Process runProcess = new Process();
+						_runningProcesses.Add(process);
+						runProcess.StartInfo.FileName = executablePath;
+						runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(executablePath);
+						await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
+						_runningProcesses.Remove(process);
+					}
 
-                if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data);
 
-            });
+				}
+			}
+			catch (Exception exc)
+			{
+				SelectedOutputTabIndex = 0;
+				BuildOutput.WriteLine("===========ERROR==========");
+				BuildOutput.WriteLine("Build and Run encountered an exception: " + exc.Message);
 
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
+			}
+		}
 
-            await process.WaitForExitAsync();
+		protected async Task RunAndMonitorProcess(Process process, TextLog_VM console, bool hideConsole, Action<string?>? receivedOutput)
+		{
+			process.StartInfo.RedirectStandardError = true;
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.CreateNoWindow = hideConsole;
+			process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+			console.Clear();
 
-        }
+			Action<string> appendText = (txt) => { console.WriteLine(txt); };
 
-        public override async Task RunProcessAsync(Process process)
-        {
-            _runningProcesses.Add(process);
-            process.Start();
-            await process.WaitForExitAsync();
+			process.OutputDataReceived += new DataReceivedEventHandler((s, e) =>
+			{
+				if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data);
+				receivedOutput?.Invoke(e.Data);
+			});
+			process.ErrorDataReceived += new DataReceivedEventHandler((s, e) =>
+			{
 
-            _runningProcesses.Remove(process);
-        }
+				if (!string.IsNullOrEmpty(e.Data)) appendText(e.Data);
 
-        public override async Task KillRunningProcesses()
-        {
-            for (int i = _runningProcesses.Count - 1; i >= 0; --i)
-            {
-                _runningProcesses[i].Kill();
-            }
+			});
 
-            while (_runningProcesses.Count > 0)
-            {
-                for(int idx = _runningProcesses.Count-1; idx >= 0; --idx)
-                {
-                    if (_runningProcesses[idx] == null || _runningProcesses[idx].HasExited)
-                    {
-                        _runningProcesses.RemoveAt(idx);
-                    }
-                }
-                await Task.Delay(1000);
-            }
-        }
+			process.Start();
+			process.BeginOutputReadLine();
+			process.BeginErrorReadLine();
 
-        private void TrimExecutablePath(ref string executablePath)
-        {
-            
-            int exeIndex = Math.Max( executablePath.IndexOf(".exe"), executablePath.IndexOf(".dll"));
-            int beforeExeIndex = executablePath.IndexOf("->", 0, exeIndex);
-            if (beforeExeIndex != -1)
-            {
-                beforeExeIndex += 3;
-                executablePath = executablePath.Substring(beforeExeIndex, exeIndex - beforeExeIndex + 4);
-            }
+			await process.WaitForExitAsync();
 
-        }
+		}
 
-        private bool IsCMakeProject()
-        {
-            return SelectedSolutionPath != null && SelectedSolutionPath.EndsWith("CMakeLists.txt");
-        }
+		public override async Task RunProcessAsync(Process process)
+		{
+			_runningProcesses.Add(process);
+			process.Start();
+			await process.WaitForExitAsync();
 
-        protected override async Task OpenInVS()
-        {
-            if (!IsCMakeProject())
-            {
-                await base.OpenInVS();
-            }
-            else if (!string.IsNullOrEmpty(SelectedSolutionPath))
-            {
-                Process process = new Process();
-                process.StartInfo.FileName = Preferences.VisualStudioPath;
-                process.StartInfo.Arguments = $"\"{Path.GetDirectoryName(SelectedSolutionPath)}\"";
-                await RunProcessAsync(process);
-            }
-        }
+			_runningProcesses.Remove(process);
+		}
 
-        private async Task GenerateCMakeProject()
-        {
-            /*set -e
+		public override async Task KillRunningProcesses()
+		{
+			for (int i = _runningProcesses.Count - 1; i >= 0; --i)
+			{
+				_runningProcesses[i].Kill();
+			}
+
+			while (_runningProcesses.Count > 0)
+			{
+				for (int idx = _runningProcesses.Count - 1; idx >= 0; --idx)
+				{
+					if (_runningProcesses[idx] == null || _runningProcesses[idx].HasExited)
+					{
+						_runningProcesses.RemoveAt(idx);
+					}
+				}
+				await Task.Delay(1000);
+			}
+		}
+
+		private void TrimExecutablePath(ref string executablePath)
+		{
+
+			int exeIndex = Math.Max(executablePath.IndexOf(".exe"), executablePath.IndexOf(".dll"));
+			int beforeExeIndex = executablePath.IndexOf("->", 0, exeIndex);
+			if (beforeExeIndex != -1)
+			{
+				beforeExeIndex += 3;
+				executablePath = executablePath.Substring(beforeExeIndex, exeIndex - beforeExeIndex + 4);
+			}
+
+		}
+
+		private bool IsCMakeProject()
+		{
+			return SelectedSolutionPath != null && SelectedSolutionPath.EndsWith("CMakeLists.txt");
+		}
+
+		protected override async Task OpenInVS()
+		{
+			if (!IsCMakeProject())
+			{
+				await base.OpenInVS();
+			}
+			else if (!string.IsNullOrEmpty(SelectedSolutionPath))
+			{
+				Process process = new Process();
+				process.StartInfo.FileName = Preferences.VisualStudioPath;
+				process.StartInfo.Arguments = $"\"{Path.GetDirectoryName(SelectedSolutionPath)}\"";
+				await RunProcessAsync(process);
+			}
+		}
+
+		private async Task GenerateCMakeProject()
+		{
+			/*set -e
 
 mkdir -p build; cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . -j`nproc`
 cd .. && SDL_VIDEODRIVER=wayland build/game */
 
-        }
+		}
 
-        private async Task BuildAndRun_CMake(bool release)
-        {
-            SelectedOutputTabIndex = 0;
-            try
-            {
-                if (!string.IsNullOrEmpty(SelectedSolutionPath))
-                {
-                    string? executablePath = null;
-                    Process process = new Process();
-                    process.StartInfo.FileName = Preferences.MSBuildPath;
-                    process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
-                    if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
-                    {
-                        process.StartInfo.Arguments += " " + Preferences.BuildParams;
-                    }
+		private async Task BuildAndRun_CMake(bool release)
+		{
+			SelectedOutputTabIndex = 0;
+			try
+			{
+				if (!string.IsNullOrEmpty(SelectedSolutionPath))
+				{
+					string? executablePath = null;
+					Process process = new Process();
+					process.StartInfo.FileName = Preferences.MSBuildPath;
+					process.StartInfo.Arguments = $"\"{SelectedSolutionPath}\"";
+					if (!string.IsNullOrWhiteSpace(Preferences.BuildParams))
+					{
+						process.StartInfo.Arguments += " " + Preferences.BuildParams;
+					}
 
-                    if (!process.StartInfo.Arguments.Contains("Configuration"))
-                    {
-                        process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
-                    }
+					if (!process.StartInfo.Arguments.Contains("Configuration"))
+					{
+						process.StartInfo.Arguments += " /property:Configuration=" + (release ? "Release" : "Debug");
+					}
 
-                    _runningProcesses.Add(process);
-                    await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
-                    {
-                        if (outputLine != null && outputLine.Contains(".exe") && outputLine.Contains("->"))
-                        {
-                            executablePath = outputLine;
-                            TrimExecutablePath(ref executablePath);
-                        }
-                    });
-                    _runningProcesses.Remove(process);
+					_runningProcesses.Add(process);
+					await RunAndMonitorProcess(process, BuildOutput, true, (outputLine) =>
+					{
+						if (outputLine != null && outputLine.Contains(".exe") && outputLine.Contains("->"))
+						{
+							executablePath = outputLine;
+							TrimExecutablePath(ref executablePath);
+						}
+					});
+					_runningProcesses.Remove(process);
 
-                    if (executablePath != null)
-                    {
-                        SelectedOutputTabIndex = 1;
-                        //Run the build
-                        Process runProcess = new Process();
-                        _runningProcesses.Add(process);
-                        runProcess.StartInfo.FileName = executablePath;
-                        runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(SelectedSolutionPath);
-                        await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
-                        _runningProcesses.Remove(process);
-                    }
+					if (executablePath != null)
+					{
+						SelectedOutputTabIndex = 1;
+						//Run the build
+						Process runProcess = new Process();
+						_runningProcesses.Add(process);
+						runProcess.StartInfo.FileName = executablePath;
+						runProcess.StartInfo.WorkingDirectory = Path.GetDirectoryName(SelectedSolutionPath);
+						await RunAndMonitorProcess(runProcess, BuildExecutionOutput, true, null);
+						_runningProcesses.Remove(process);
+					}
 
 
-                }
-            }
-            catch (Exception exc)
-            {
-                SelectedOutputTabIndex = 0;
-                BuildOutput.WriteLine("===========ERROR==========");
-                BuildOutput.WriteLine("Build and Run encountered an exception: " + exc.Message);
+				}
+			}
+			catch (Exception exc)
+			{
+				SelectedOutputTabIndex = 0;
+				BuildOutput.WriteLine("===========ERROR==========");
+				BuildOutput.WriteLine("Build and Run encountered an exception: " + exc.Message);
 
-            }
-        }
-    }
+			}
+		}
+	}
 }

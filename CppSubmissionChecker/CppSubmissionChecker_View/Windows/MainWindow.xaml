@@ -42,8 +42,10 @@
             </StackPanel>
             <DockPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisibility}}" LastChildFill="true" >
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Button Command="{Binding CloseArchiveCommand}">Close</Button>
                     <Button Click="FraudDetection_Click">FD</Button>
-                    <Button Command="{Binding SelectedArchive.BatchOpenInUnityCommand}" >Batch Open in Unity</Button>
+                    <Button Visibility="{Binding SelectedArchive.CanBatchOpen, Converter={StaticResource BoolToVisibility}}"
+                            Command="{Binding SelectedArchive.BatchCommand}" Content="{Binding SelectedArchive.BatchOpenText}"></Button>
                 </StackPanel>
 
                 <TabControl>

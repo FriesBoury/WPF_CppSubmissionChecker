@@ -1,22 +1,17 @@
-﻿using CppSubmissionChecker_ViewModel.DataClasses;
-using CppSubmissionChecker_ViewModel.Interfaces;
-using CppSubmissionChecker_ViewModel.Viewmodels;
+﻿using CommunityToolkit.Mvvm.Input;
+using CppSubmissionChecker_ViewModel.DataClasses;
 using CppSubmissionChecker_ViewModel.Viewmodels.Submissions;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CppSubmissionChecker_ViewModel
 {
 
-	public class SubmissionCheckerViewModel : ViewmodelBase
+	public partial class SubmissionCheckerViewModel : ViewmodelBase
 	{
 		public event Action<Exception>? ExceptionFired;
 		private MultiSubmissionZipArchive? _selectedArchive;
 		public bool HasData => _selectedArchive != null;
+
 
 		public SubmissionFactory SubmissionFactory { get; private set; }
 
@@ -38,6 +33,11 @@ namespace CppSubmissionChecker_ViewModel
 				OnPropertyChanged(nameof(HasData));
 				OnPropertyChanged(nameof(WindowTitle));
 			}
+		}
+		[RelayCommand]
+		private void CloseArchive()
+		{
+			SelectedArchive = null;
 		}
 
 		public void LoadArchive(ZipArchive zipArchive, string fileName)
